@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceWorkOrdersPlugin", "ServiceWorkOrdersPlugin\ServiceWorkOrdersPlugin.csproj", "{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F645CF0E-047F-440F-9E10-5CC6A229C611}
+	EndGlobalSection
+EndGlobal
