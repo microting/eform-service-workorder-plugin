@@ -4,6 +4,9 @@ using Castle.Windsor;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Rebus.Handlers;
+using ServiceWorkOrdersPlugin.Handlers;
+using ServiceWorkOrdersPlugin.Messages;
 
 namespace ServiceWorkOrdersPlugin.Installers
 {
@@ -11,10 +14,7 @@ namespace ServiceWorkOrdersPlugin.Installers
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            //container.Register(Component.For<IHandleMessages<ScheduledItemExecuted>>().ImplementedBy<ScheduledItemExecutedHandler>().LifestyleTransient());
-            //container.Register(Component.For<IHandleMessages<eFormCompleted>>().ImplementedBy<EFormCompletedHandler>().LifestyleTransient());
-            //container.Register(Component.For<IHandleMessages<eFormRetrieved>>().ImplementedBy<EFormRetrievedHandler>().LifestyleTransient());
-            //container.Register(Component.For<IHandleMessages<ItemCaseCreate>>().ImplementedBy<ItemCaseCreateHandler>().LifestyleTransient());
+            container.Register(Component.For<IHandleMessages<eFormCompleted>>().ImplementedBy<EFormCompletedHandler>().LifestyleTransient());
         }
     }
 }
