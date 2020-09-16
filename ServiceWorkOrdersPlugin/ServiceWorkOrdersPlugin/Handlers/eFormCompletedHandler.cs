@@ -9,13 +9,11 @@ using ServiceWorkOrdersPlugin.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ServiceWorkOrdersPlugin.Handlers
 {
     using System.Diagnostics;
-    using System.Reflection.Metadata.Ecma335;
 
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
     {
@@ -64,6 +62,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
+                var picturesOfTasks = new List<string>();
                 if (fields.Any())
                 {
                     // field[0] - picture of the task
@@ -81,7 +80,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach(FieldValue fieldValue in fields[0].FieldValues)
                         {
-                            workOrder.PicturesOfTask.Push(fieldValue.UploadedDataObj.FileName);
+                            picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
                         }
                     }
                 }
@@ -90,6 +89,18 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 workOrder.CreatedByUserId = replyElement.SiteMicrotingUuid;
                 workOrder.WorkflowState = Constants.WorkflowStates.Created;
                 await workOrder.Create(_dbContext);
+
+                foreach (var picturesOfTask in picturesOfTasks)
+                {
+                    var pictureOfTask = new PicturesOfTask
+                    {
+                        FileName = picturesOfTask,
+                        WorkOrderId = workOrder.Id,
+                    };
+
+                    await pictureOfTask.Create(_dbContext);
+                }
+
 
                 MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
                 mainElement.Label = fields[1].FieldValues[0].Value;
@@ -110,9 +121,11 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.Id, null);
                     wotList.Add(new WorkOrdersTemplateCases()
                     {
-                        MicrotingId = message.MicrotingId,
+                        CheckId = message.CheckId,
+                        CheckUId = message.CheckUId,
                         WorkOrderId = workOrder.Id,
-                        CaseId = (int)caseId
+                        CaseId = (int)caseId,
+                        CaseUId = message.MicrotingId,
                     });
                 }
                 await _dbContext.WorkOrdersTemplateCases.AddRangeAsync(wotList);
@@ -132,7 +145,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                             x.WorkOrderId != workOrdersTemplate.WorkOrderId && 
-                            x.MicrotingId == message.MicrotingId).ToListAsync();
+                            x.CaseUId == message.MicrotingId).ToListAsync();
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
@@ -146,7 +159,13 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach (FieldValue fieldValue in fields[0].FieldValues)
                         {
-                            workOrder.PicturesOfTaskDone.Push(fieldValue.UploadedDataObj.FileName);
+                            var pictureOfTask = new PicturesOfTaskDone
+                            {
+                                FileName = fieldValue.UploadedDataObj.FileName,
+                                WorkOrderId = workOrder.Id,
+                            };
+
+                            await pictureOfTask.Create(_dbContext);
                         }
                     }
 
