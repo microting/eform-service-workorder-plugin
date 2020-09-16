@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace ServiceWorkOrdersPlugin.Handlers
 {
     using System.Diagnostics;
+    using System.Reflection.Metadata.Ecma335;
 
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
     {
@@ -32,20 +33,36 @@ namespace ServiceWorkOrdersPlugin.Handlers
             Debugger.Break();
             Console.WriteLine("[INF] EFormCompletedHandler.Handle: called");
 
-            int createNewTaskEFormId = 142108;
-            int createTaskListEFormId = 142109;
+            string newTaskIdValue = _dbContext.PluginConfigurationValues
+                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:NewTaskId")?.Value;
 
-            var createNewTaskEForm = _sdkCore.TemplateItemRead(createNewTaskEFormId);
-            var createTaskListEForm = _sdkCore.TemplateItemRead(createTaskListEFormId);
-
-            if (message.CheckId == createNewTaskEFormId)
+            bool newTaskIdParseResult = int.TryParse(newTaskIdValue, out int newTaskId);
+            if (!newTaskIdParseResult)
             {
-                var workOrder = new WorkOrder();
+                const string errorMessage = "[ERROR] New task eform id not found in setting";
+                Console.WriteLine(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            string taskListIdValue = _dbContext.PluginConfigurationValues
+                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:TaskListId")?.Value;
+
+            bool taskListIdParseResult = int.TryParse(taskListIdValue, out int taskListId);
+            if (!taskListIdParseResult)
+            {
+                const string errorMessage = "[ERROR] Task list eform id not found in setting";
+                Console.WriteLine(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            if (message.CheckId == newTaskId)
+            {
+                WorkOrder workOrder = new WorkOrder();
 
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
-                var replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId); 
-                var checkListValue = (CheckListValue)replyElement.ElementList[0];
-                var fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
+                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId); 
+                CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
+                List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
                 if (fields.Any())
                 {
@@ -62,9 +79,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     if(fields[0].FieldValues.Count > 0)
                     {
-                        foreach(var fieldValue in fields[0].FieldValues)
+                        foreach(FieldValue fieldValue in fields[0].FieldValues)
                         {
-                            
                         }
                     }
                 }
@@ -74,27 +90,26 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 workOrder.WorkflowState = Constants.WorkflowStates.Created;
                 await workOrder.Create(_dbContext);
 
-                MainElement mainElement;
-                mainElement = await _sdkCore.TemplateRead(createTaskListEFormId);
+                MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
                 mainElement.Label = fields[1].FieldValues[0].Value;
                 mainElement.Repeated = 1;
                 mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
 
-                var dataElement = (DataElement)mainElement.ElementList[0]; // 0 - desc, 1 - pict, ...
+                DataElement dataElement = (DataElement)mainElement.ElementList[0]; // 0 - desc, 1 - pict, ...
                 dataElement.Description.InderValue = "Corrected at the latest: ";
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value.ToString())
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
-                var dataItem = (Text)dataElement.DataItemList[0];
+                Text dataItem = (Text)dataElement.DataItemList[0];
                 dataItem.Value = workOrder.Description;
 
-                var sites = await _dbContext.AssignedSites.ToListAsync();
-                var wotList = new List<WorkOrdersTemplateCases>();
-                foreach (var site in sites)
+                List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
+                List<WorkOrdersTemplateCases> wotList = new List<WorkOrdersTemplateCases>();
+                foreach (AssignedSite site in sites)
                 {
-                    var caseId = await _sdkCore.CaseCreate(mainElement, "", site.Id, null);
+                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.Id, null);
                     wotList.Add(new WorkOrdersTemplateCases()
                     {
                         MicrotingId = message.MicrotingId,
@@ -104,25 +119,23 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 }
                 await _dbContext.WorkOrdersTemplateCases.AddRangeAsync(wotList);
             }
-            else if (message.CheckId == createTaskListEFormId)
+            else if (message.CheckId == taskListId)
             {
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createTaskListEFormId");
 
-                var workOrdersTemplate = new WorkOrdersTemplateCases();
-                workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
-                            x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
+                WorkOrdersTemplateCases workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                    x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
 
-                var workOrder = new WorkOrder();
-                workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
+                WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
 
-                var replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId);
-                var checkListValue = (CheckListValue)replyElement.ElementList[0];
-                var fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
+                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId);
+                CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
+                List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
-                var wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                             x.WorkOrderId != workOrdersTemplate.WorkOrderId && 
                             x.MicrotingId == message.MicrotingId).ToListAsync();
-                foreach(var wotToDelete in wotListToDelete)
+                foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
                     await wotToDelete.Update(_dbContext);

@@ -1,8 +1,5 @@
 ﻿using Microting.WorkOrderBase.Infrastructure.Data;
 using Microting.WorkOrderBase.Infrastructure.Data.Factories;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ServiceWorkOrdersPlugin.Infrastructure.Helpers
 {

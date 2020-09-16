@@ -122,8 +122,8 @@ namespace ServiceWorkOrdersPlugin
                 }
 
 
-                var pluginDbName = $"Initial Catalog={dbPrefix}_eform-angular-work-orders-plugin;";
-                var connectionString = sdkConnectionString.Replace(dbNameSection, pluginDbName);
+                string pluginDbName = $"Initial Catalog={dbPrefix}_eform-angular-work-orders-plugin;";
+                string connectionString = sdkConnectionString.Replace(dbNameSection, pluginDbName);
 
 
                 if (!_coreAvailable && !_coreStatChanging)
@@ -189,7 +189,7 @@ namespace ServiceWorkOrdersPlugin
 
                     _coreAvailable = false;
 
-                    var tries = 0;
+                    int tries = 0;
                     while (_coreThreadRunning)
                     {
                         Thread.Sleep(100);
