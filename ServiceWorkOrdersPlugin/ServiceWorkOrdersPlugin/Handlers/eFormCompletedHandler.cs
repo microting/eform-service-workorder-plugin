@@ -80,7 +80,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach(FieldValue fieldValue in fields[0].FieldValues)
                         {
-                            picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
+                            if (fieldValue.UploadedDataObj != null)
+                            {
+                                picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
+                            }
                         }
                     }
                 }
@@ -144,8 +147,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
                 List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
-                            x.WorkOrderId != workOrdersTemplate.WorkOrderId && 
-                            x.CaseUId == message.MicrotingId).ToListAsync();
+                            x.WorkOrderId == workOrdersTemplate.WorkOrderId && 
+                            x.CaseUId != message.MicrotingId).ToListAsync();
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
