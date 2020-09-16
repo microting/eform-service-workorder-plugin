@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ServiceWorkOrdersPlugin.Messages
+﻿namespace ServiceWorkOrdersPlugin.Messages
 {
     public class eFormCompleted
     {

@@ -26,6 +26,7 @@ namespace ServiceWorkOrdersPlugin
 {
     using System;
     using System.ComponentModel.Composition;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -80,6 +81,7 @@ namespace ServiceWorkOrdersPlugin
 
         public void CaseCompleted(object sender, EventArgs args)
         {
+            Debugger.Break();
             CaseDto trigger = (CaseDto)sender;
 
             if (trigger.CaseId != null && trigger.CheckListId != 0)
@@ -102,6 +104,7 @@ namespace ServiceWorkOrdersPlugin
 
         public bool Start(string sdkConnectionString, string serviceLocation)
         {
+            Debugger.Break();
             Console.WriteLine("ServiceWorkOrdersPlugin start called");
             try
             {

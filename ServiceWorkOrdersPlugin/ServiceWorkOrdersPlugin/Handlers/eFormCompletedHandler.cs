@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 
 namespace ServiceWorkOrdersPlugin.Handlers
 {
+    using System.Diagnostics;
+
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
     {
         private readonly eFormCore.Core _sdkCore;
@@ -27,6 +29,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
         public async Task Handle(eFormCompleted message)
         {
+            Debugger.Break();
             Console.WriteLine("[INF] EFormCompletedHandler.Handle: called");
 
             int createNewTaskEFormId = 142108;
