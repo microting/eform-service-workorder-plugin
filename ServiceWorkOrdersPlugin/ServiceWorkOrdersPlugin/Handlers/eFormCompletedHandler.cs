@@ -60,7 +60,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 WorkOrder workOrder = new WorkOrder();
 
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
-                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId); 
+                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId); 
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
@@ -81,6 +81,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach(FieldValue fieldValue in fields[0].FieldValues)
                         {
+                            workOrder.PicturesOfTask.Push(fieldValue.UploadedDataObj.FileName);
                         }
                     }
                 }
@@ -101,9 +102,6 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value.ToString())
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
-
-                Text dataItem = (Text)dataElement.DataItemList[0];
-                dataItem.Value = workOrder.Description;
 
                 List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
                 List<WorkOrdersTemplateCases> wotList = new List<WorkOrdersTemplateCases>();
@@ -128,7 +126,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
 
-                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckId);
+                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
@@ -144,6 +142,14 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 if (fields.Any())
                 {
                     // field[3] - pictures of the done task
+                    if (fields[3].FieldValues.Count > 0)
+                    {
+                        foreach (FieldValue fieldValue in fields[0].FieldValues)
+                        {
+                            workOrder.PicturesOfTaskDone.Push(fieldValue.UploadedDataObj.FileName);
+                        }
+                    }
+
                     if (!string.IsNullOrEmpty(fields[4]?.FieldValues[0]?.Value))
                     {
                         workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;

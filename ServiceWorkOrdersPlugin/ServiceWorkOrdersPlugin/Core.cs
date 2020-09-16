@@ -84,11 +84,12 @@ namespace ServiceWorkOrdersPlugin
             Debugger.Break();
             CaseDto trigger = (CaseDto)sender;
 
-            if (trigger.CaseId != null && trigger.CheckListId != 0)
+            if (trigger.MicrotingUId != null && trigger.CheckUId != null)
             {
-                int caseId = (int)trigger.CaseId;
-                int checkListId = trigger.CheckListId;
-                _bus.SendLocal(new eFormCompleted(caseId, checkListId));
+                int caseId = (int)trigger.MicrotingUId;
+                int checkListId = (int)trigger.CheckListId;
+                int checkUId = (int) trigger.CheckUId;
+                _bus.SendLocal(new eFormCompleted(caseId, checkListId, checkUId));
             }
         }
 
