@@ -93,7 +93,8 @@ namespace ServiceWorkOrdersPlugin
                 int caseId = (int)trigger.MicrotingUId;
                 int checkListId = (int)trigger.CheckListId;
                 int checkUId = (int) trigger.CheckUId;
-                _bus.SendLocal(new eFormCompleted(caseId, checkListId, checkUId));
+                int siteId = (int) trigger.SiteUId;
+                _bus.SendLocal(new eFormCompleted(caseId, checkListId, checkUId, siteId));
             }
         }
 

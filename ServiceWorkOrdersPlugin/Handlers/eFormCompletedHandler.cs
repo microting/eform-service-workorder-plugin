@@ -130,32 +130,31 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
 
                 MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
-                mainElement.Label = fields[1].FieldValues[0].Value;
                 mainElement.Repeated = 1;
                 mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
 
-                DataElement dataElement = (DataElement)mainElement.ElementList[0]; // 0 - desc, 1 - pict, ...
+                DataElement dataElement = (DataElement)mainElement.ElementList[0];
+                dataElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Description.InderValue = "Corrected at the latest: ";
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value.ToString())
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
                 List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
-                List<WorkOrdersTemplateCases> wotList = new List<WorkOrdersTemplateCases>();
                 foreach (AssignedSite site in sites)
                 {
-                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.Id, null);
-                    wotList.Add(new WorkOrdersTemplateCases()
+                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, null);
+                    var wotCase = new WorkOrdersTemplateCases()
                     {
                         CheckId = message.CheckId,
                         CheckUId = message.CheckUId,
                         WorkOrderId = workOrder.Id,
-                        CaseId = (int)caseId,
-                        CaseUId = message.MicrotingId,
-                    });
+                        CaseId = (int) caseId,
+                        CaseUId = message.MicrotingId
+                    };
+                    await wotCase.Create(_dbContext);
                 }
-                await _dbContext.WorkOrdersTemplateCases.AddRangeAsync(wotList);
             }
             else if (message.CheckId == taskListId)
             {
@@ -172,7 +171,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                             x.WorkOrderId == workOrdersTemplate.WorkOrderId && 
-                            x.CaseUId != message.MicrotingId).ToListAsync();
+                            x.CaseId != message.MicrotingId).ToListAsync();
+
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
@@ -184,7 +184,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     // field[3] - pictures of the done task
                     if (fields[3].FieldValues.Count > 0)
                     {
-                        foreach (FieldValue fieldValue in fields[0].FieldValues)
+                        foreach (FieldValue fieldValue in fields[3].FieldValues)
                         {
                             var pictureOfTask = new PicturesOfTaskDone
                             {
@@ -202,7 +202,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     }
 
                     // Add pictures, checkbox 
-                    workOrder.DoneBySiteId = replyElement.DoneById;
+                    workOrder.DoneBySiteId = message.SiteId;
                     workOrder.DoneAt = DateTime.UtcNow;
                     await workOrder.Update(_dbContext);
                 }
