@@ -29,11 +29,11 @@ using Microting.WorkOrderBase.Infrastructure.Data;
 using Microting.WorkOrderBase.Infrastructure.Data.Entities;
 using Rebus.Handlers;
 using ServiceWorkOrdersPlugin.Infrastructure.Helpers;
-using ServiceWorkOrdersPlugin.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Messages;
 
 namespace ServiceWorkOrdersPlugin.Handlers
 {

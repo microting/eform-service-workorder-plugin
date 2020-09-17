@@ -28,9 +28,9 @@ using Castle.Windsor;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Messages;
 using Rebus.Handlers;
 using ServiceWorkOrdersPlugin.Handlers;
-using ServiceWorkOrdersPlugin.Messages;
 
 namespace ServiceWorkOrdersPlugin.Installers
 {
