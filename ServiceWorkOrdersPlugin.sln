@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceWorkOrdersPlugin", "ServiceWorkOrdersPlugin\ServiceWorkOrdersPlugin.csproj", "{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{782DB25D-E535-499E-BE42-7B30F6DADE2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceWorkOrdersPlugin.Integration.Test", "ServiceWorkOrdersPlugin.Integration.Test\ServiceWorkOrdersPlugin.Integration.Test.csproj", "{78DE27C9-A331-44B9-83E9-4E18ED55607C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +19,18 @@ Global
 		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2230568-E1C8-4F47-895F-D4B6D7F23ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78DE27C9-A331-44B9-83E9-4E18ED55607C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78DE27C9-A331-44B9-83E9-4E18ED55607C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78DE27C9-A331-44B9-83E9-4E18ED55607C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78DE27C9-A331-44B9-83E9-4E18ED55607C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F645CF0E-047F-440F-9E10-5CC6A229C611}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{78DE27C9-A331-44B9-83E9-4E18ED55607C} = {782DB25D-E535-499E-BE42-7B30F6DADE2D}
 	EndGlobalSection
 EndGlobal

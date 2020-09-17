@@ -1,4 +1,4 @@
-﻿/*
+/*
 The MIT License (MIT)
 
 Copyright (c) 2007 - 2020 Microting A/S
@@ -22,19 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace ServiceWorkOrdersPlugin.Messages
+namespace ServiceWorkOrdersPlugin.Integration.Test
 {
-    public class eFormCompleted
-    {
-        public int MicrotingId { get; protected set; }
-        public int CheckId { get; protected set; }
-        public int CheckUId { get; protected set; }
+    using NUnit.Framework;
 
-        public eFormCompleted(int microtingId, int checkId, int checkUId)
+    [TestFixture]
+    public class CanaryInAColeMine
+    {
+        [Test]
+        public void CanPeep()
         {
-            MicrotingId = microtingId;
-            CheckId = checkId;
-            CheckUId = checkUId;
+            Assert.True(true);
         }
     }
 }
