@@ -138,6 +138,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
+                dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
+
+
                 List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
                 foreach (AssignedSite site in sites)
                 {
