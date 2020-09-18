@@ -18,7 +18,7 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
     <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.22" />
-    <PackageReference Include="Microting.WorkOrderBase" Version="1.0.5" />
+    <PackageReference Include="Microting.WorkOrderBase" Version="1.0.6" />
   </ItemGroup>
 
 </Project>
