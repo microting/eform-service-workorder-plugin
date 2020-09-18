@@ -25,4 +25,4 @@ rm -fR /var/www/microting/eform-debian-service/MicrotingService/out/Plugins/Serv
 
 su ubuntu -c \
 "cp -av /var/www/microting/eform-service-workorder-plugin/out /var/www/microting/eform-debian-service/MicrotingService/out/Plugins/ServiceWorkOrdersPlugin"
-/root/rabbitmqadmin declare queue name=eform-service-workorder-plugin durable=true
+/root/rabbitmqadmin declare queue name=eform-service-workorders-plugin durable=true
