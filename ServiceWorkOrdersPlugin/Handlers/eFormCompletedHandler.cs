@@ -52,7 +52,6 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
         public async Task Handle(eFormCompleted message)
         {
-            Debugger.Break();
             Console.WriteLine("[INF] EFormCompletedHandler.Handle: called");
 
             string newTaskIdValue = _dbContext.PluginConfigurationValues
