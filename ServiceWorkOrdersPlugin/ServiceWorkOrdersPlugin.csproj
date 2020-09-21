@@ -9,6 +9,16 @@
     <OutputPath>../../MicrotingService/bin/Debug/Plugins/ServiceWorkOrdersPlugin</OutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Resources\Templates\file.docx" />
+    <None Remove="Resources\Templates\page.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Templates\file.docx" />
+    <EmbeddedResource Include="Resources\Templates\page.html" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.8" />
@@ -19,6 +29,8 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
     <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.22" />
     <PackageReference Include="Microting.WorkOrderBase" Version="1.0.5" />
+    <PackageReference Include="HtmlToOpenXml.dll" Version="2.1.0" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
   </ItemGroup>
 
 </Project>
