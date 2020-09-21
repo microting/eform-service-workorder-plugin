@@ -76,6 +76,27 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 throw new Exception(errorMessage);
             }
 
+            string folderIdValue = _dbContext.PluginConfigurationValues
+                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:FolderId")?.Value;
+
+            int? folderId;
+            if (string.IsNullOrEmpty(folderIdValue) || folderIdValue == "0")
+            {
+                folderId = null;
+            }
+            else
+            {
+                bool folderIdParseResult = int.TryParse(folderIdValue, out int result);
+                if (!folderIdParseResult)
+                {
+                    var errorMessage = $"[ERROR] Folder id parse error. folderIdValue: {folderIdValue}";
+                    Console.WriteLine(errorMessage);
+                    throw new Exception(errorMessage);
+                }
+
+                folderId = result;
+            }
+
             if (message.CheckId == newTaskId)
             {
                 WorkOrder workOrder = new WorkOrder();
@@ -140,10 +161,13 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
+                dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
+
+
                 List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
                 foreach (AssignedSite site in sites)
                 {
-                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, null);
+                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
                     var wotCase = new WorkOrdersTemplateCases()
                     {
                         CheckId = message.CheckId,
