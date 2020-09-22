@@ -22,25 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Microsoft.EntityFrameworkCore;
-using Microting.eForm.Infrastructure.Constants;
-using Microting.eForm.Infrastructure.Models;
-using Microting.WorkOrderBase.Infrastructure.Data;
-using Microting.WorkOrderBase.Infrastructure.Data.Entities;
-using Rebus.Handlers;
-using ServiceWorkOrdersPlugin.Infrastructure.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Messages;
-
 namespace ServiceWorkOrdersPlugin.Handlers
 {
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
     {
         private readonly eFormCore.Core _sdkCore;
         private readonly WorkOrderPnDbContext _dbContext;
+        private bool _s3Enabled;
+        private bool _swiftEnabled;
 
         public EFormCompletedHandler(eFormCore.Core sdkCore, DbContextHelper dbContextHelper)
         {
@@ -51,6 +40,16 @@ namespace ServiceWorkOrdersPlugin.Handlers
         public async Task Handle(eFormCompleted message)
         {
             Console.WriteLine("[INF] EFormCompletedHandler.Handle: called");
+
+            _s3Enabled = _sdkCore.GetSdkSetting(Settings.s3Enabled).Result.ToLower() == "true";
+            _swiftEnabled = _sdkCore.GetSdkSetting(Settings.swiftEnabled).Result.ToLower() == "true";
+            string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
+
+            // Docx and PDF files
+            string docxFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.docx";
+            string tempPDFFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.pdf";
+            string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
+
 
             string newTaskIdValue = _dbContext.PluginConfigurationValues
                 .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:NewTaskId")?.Value;
@@ -100,7 +99,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 WorkOrder workOrder = new WorkOrder();
 
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
-                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId); 
+                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
@@ -162,6 +161,67 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
 
+                // Read html and template
+                var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
+                var assembly = Assembly.GetExecutingAssembly();
+                string html;
+                await using (var resourceStream = assembly.GetManifestResourceStream(resourceString))
+                {
+                    using var reader = new StreamReader(resourceStream ?? throw new InvalidOperationException($"{nameof(resourceStream)} is null"));
+                    html = reader.ReadToEnd();
+                }
+
+                // Read docx stream
+                resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.file.docx";
+                var docxFileResourceStream = assembly.GetManifestResourceStream(resourceString);
+                if (docxFileResourceStream == null)
+                {
+                    throw new InvalidOperationException($"{nameof(docxFileResourceStream)} is null");
+                }
+
+                var docxFileStream = new MemoryStream();
+                await docxFileResourceStream.CopyToAsync(docxFileStream);
+                docxFileResourceStream.Dispose();
+                string basePicturePath = await _sdkCore.GetSdkSetting(Settings.fileLocationPicture);
+                var word = new WordProcessor(docxFileStream);
+                string imagesHtml = "";
+
+                foreach (var imagesName in picturesOfTasks)
+                {
+                    imagesHtml = await InsertImage(imagesName, imagesHtml, 700, 650, basePicturePath);
+                }
+
+                html = html.Replace("{%Content%}", imagesHtml);
+
+                word.AddHtml(html);
+                word.Dispose();
+                docxFileStream.Position = 0;
+
+                // Build docx
+                await using (var docxFile = new FileStream(docxFileName, FileMode.Create, FileAccess.Write))
+                {
+                    docxFileStream.WriteTo(docxFile);
+                }
+
+                // Convert to PDF
+                ReportHelper.ConvertToPdf(docxFileName, tempPDFFilePath);
+                File.Delete(docxFileName);
+
+                // Upload PDF
+                string pdfFileName = null;
+                string hash = await _sdkCore.PdfUpload(pdfFileName);
+                if (hash != null)
+                {
+                    //rename local file
+                    FileInfo fileInfo = new FileInfo(tempPDFFilePath);
+                    fileInfo.CopyTo(downloadPath + hash + ".pdf", true);
+                    fileInfo.Delete();
+                    await _sdkCore.PutFileToStorageSystem(Path.Combine(downloadPath, $"{hash}.pdf"), $"{hash}.pdf");
+
+                    // TODO Remove from file storage?
+
+                    ((ShowPdf)dataElement.DataItemList[1]).Value = hash;
+                }
 
                 List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
                 foreach (AssignedSite site in sites)
@@ -192,7 +252,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
                 List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
-                            x.WorkOrderId == workOrdersTemplate.WorkOrderId && 
+                            x.WorkOrderId == workOrdersTemplate.WorkOrderId &&
                             x.CaseId != message.MicrotingId).ToListAsync();
 
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
@@ -223,12 +283,57 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;
                     }
 
-                    // Add pictures, checkbox 
+                    // Add pictures, checkbox
                     workOrder.DoneBySiteId = message.SiteId;
                     workOrder.DoneAt = DateTime.UtcNow;
                     await workOrder.Update(_dbContext);
                 }
             }
+        }
+
+        private async Task<string> InsertImage(string imageName, string itemsHtml, int imageSize, int imageWidth, string basePicturePath)
+        {
+            var filePath = Path.Combine(basePicturePath, imageName);
+            Stream stream;
+            if (_swiftEnabled)
+            {
+                var storageResult = await _sdkCore.GetFileFromSwiftStorage(imageName);
+                stream = storageResult.ObjectStreamContent;
+            }
+            else if (_s3Enabled)
+            {
+                var storageResult = await _sdkCore.GetFileFromS3Storage(imageName);
+                stream = storageResult.ResponseStream;
+            }
+            else if (!File.Exists(filePath))
+            {
+                return null;
+                // return new OperationDataResult<Stream>(
+                //     false,
+                //     _localizationService.GetString($"{imagesName} not found"));
+            }
+            else
+            {
+                stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            }
+
+            using (var image = new MagickImage(stream))
+            {
+                decimal currentRation = image.Height / (decimal)image.Width;
+                int newWidth = imageSize;
+                int newHeight = (int)Math.Round((currentRation * newWidth));
+
+                image.Resize(newWidth, newHeight);
+                image.Crop(newWidth, newHeight);
+
+                var base64String = image.ToBase64();
+                itemsHtml +=
+                    $@"<p><img src=""data:image/png;base64,{base64String}"" width=""{imageWidth}px"" alt="""" /></p>";
+            }
+
+            await stream.DisposeAsync();
+
+            return itemsHtml;
         }
     }
 }
