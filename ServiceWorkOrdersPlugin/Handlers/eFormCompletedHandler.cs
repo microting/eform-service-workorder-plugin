@@ -66,9 +66,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
             string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
 
             // Docx and PDF files
-            string docxFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.docx";
-            string tempPDFFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.pdf";
-            string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
+            string docxFileName = Path.Combine(downloadPath, $"{DateTime.UtcNow.Ticks}{message.SiteId}_temp.docx");
+            string tempPDFFileName = $"{DateTime.UtcNow.Ticks}{message.SiteId}_temp.pdf";
+            string tempPDFFilePath = Path.Combine(downloadPath);
 
 
             string newTaskIdValue = _dbContext.PluginConfigurationValues
