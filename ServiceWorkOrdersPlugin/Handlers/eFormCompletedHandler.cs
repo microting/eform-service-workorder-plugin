@@ -22,6 +22,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using ImageMagick;
+using Messages;
+using Microsoft.EntityFrameworkCore;
+using Microting.eForm.Dto;
+using Microting.eForm.Helpers;
+using Microting.eForm.Infrastructure.Constants;
+using Microting.eForm.Infrastructure.Models;
+using Microting.WorkOrderBase.Infrastructure.Data;
+using Microting.WorkOrderBase.Infrastructure.Data.Entities;
+using Rebus.Handlers;
+using ServiceWorkOrdersPlugin.Infrastructure.Helpers;
+
 namespace ServiceWorkOrdersPlugin.Handlers
 {
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
