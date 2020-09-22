@@ -37,8 +37,6 @@ using Messages;
 
 namespace ServiceWorkOrdersPlugin.Handlers
 {
-    using System.Diagnostics;
-
     public class EFormCompletedHandler : IHandleMessages<eFormCompleted>
     {
         private readonly eFormCore.Core _sdkCore;
@@ -155,9 +153,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
+                mainElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Label = fields[1].FieldValues[0].Value;
-                dataElement.Description.InderValue = "Corrected at the latest: ";
-                dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value.ToString())
+                dataElement.Description.InderValue = "Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
+                dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
