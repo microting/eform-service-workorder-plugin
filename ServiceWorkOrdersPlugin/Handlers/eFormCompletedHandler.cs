@@ -68,7 +68,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
             // Docx and PDF files
             string docxFileName = Path.Combine(downloadPath, $"{DateTime.UtcNow.Ticks}{message.SiteId}_temp.docx");
             string tempPDFFileName = $"{DateTime.UtcNow.Ticks}{message.SiteId}_temp.pdf";
-            string tempPDFFilePath = Path.Combine(downloadPath);
+            string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
 
 
             string newTaskIdValue = _dbContext.PluginConfigurationValues
