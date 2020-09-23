@@ -66,7 +66,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
             // Docx and PDF files
             string timeStamp = DateTime.UtcNow.ToString("yyyyMMdd") + "_" + DateTime.UtcNow.ToString("hhmmss");
             string docxFileName = $"{timeStamp}{message.SiteId}_temp.docx";
-            string tempPDFFileName = $"{timeStamp}-{message.SiteId}_temp.pdf";
+            string tempPDFFileName = $"{timeStamp}{message.SiteId}_temp.pdf";
             string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
 
 
