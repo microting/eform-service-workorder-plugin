@@ -165,12 +165,14 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 }
 
                 var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
+                string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == int.Parse(folderResult.Value))
+                    .MicrotingUid.ToString();
 
                 MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
                 mainElement.Repeated = 1;
                 mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
-                mainElement.CheckListFolderName = folderResult.Value;
+                mainElement.CheckListFolderName = folderMicrotingUid;
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
@@ -244,7 +246,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     ((ShowPdf)dataElement.DataItemList[1]).Value = hash;
                 }
 
-                List<AssignedSite> sites = await _dbContext.AssignedSites.ToListAsync();
+                List<AssignedSite> sites = await _dbContext.AssignedSites.Where(x => x.WorkflowState != Constants.WorkflowStates.Removed).ToListAsync();
                 foreach (AssignedSite site in sites)
                 {
                     int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
