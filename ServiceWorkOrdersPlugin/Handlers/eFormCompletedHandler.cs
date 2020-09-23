@@ -164,11 +164,13 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     await pictureOfTask.Create(_dbContext);
                 }
 
+                var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
 
                 MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
                 mainElement.Repeated = 1;
                 mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
+                mainElement.CheckListFolderName = folderResult.Value;
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
