@@ -85,7 +85,6 @@ namespace ServiceWorkOrdersPlugin
 
         public void CaseCompleted(object sender, EventArgs args)
         {
-            Debugger.Break();
             CaseDto trigger = (CaseDto)sender;
 
             if (trigger.MicrotingUId != null && trigger.CheckUId != null)
@@ -110,7 +109,6 @@ namespace ServiceWorkOrdersPlugin
 
         public bool Start(string sdkConnectionString, string serviceLocation)
         {
-            Debugger.Break();
             Console.WriteLine("ServiceWorkOrdersPlugin start called");
             try
             {
