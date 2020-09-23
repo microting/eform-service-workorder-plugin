@@ -64,8 +64,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
             string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
 
             // Docx and PDF files
-            string docxFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.docx";
-            string tempPDFFileName = $"{DateTime.UtcNow}{message.SiteId}_temp.pdf";
+            string timeStamp = DateTime.UtcNow.ToString("yyyyMMdd") + "_" + DateTime.UtcNow.ToString("hhmmss");
+            string docxFileName = $"{timeStamp}{message.SiteId}_temp.docx";
+            string tempPDFFileName = $"{timeStamp}-{message.SiteId}_temp.pdf";
             string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
 
 
@@ -186,7 +187,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 await using (var resourceStream = assembly.GetManifestResourceStream(resourceString))
                 {
                     using var reader = new StreamReader(resourceStream ?? throw new InvalidOperationException($"{nameof(resourceStream)} is null"));
-                    html = reader.ReadToEnd();
+                    html = await reader.ReadToEndAsync();
                 }
 
                 // Read docx stream
@@ -199,7 +200,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 var docxFileStream = new MemoryStream();
                 await docxFileResourceStream.CopyToAsync(docxFileStream);
-                docxFileResourceStream.Dispose();
+                await docxFileResourceStream.DisposeAsync();
                 string basePicturePath = await _sdkCore.GetSdkSetting(Settings.fileLocationPicture);
                 var word = new WordProcessor(docxFileStream);
                 string imagesHtml = "";
@@ -222,12 +223,12 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 }
 
                 // Convert to PDF
-                ReportHelper.ConvertToPdf(docxFileName, tempPDFFilePath);
+                ReportHelper.ConvertToPdf(docxFileName, downloadPath);
                 File.Delete(docxFileName);
 
                 // Upload PDF
-                string pdfFileName = null;
-                string hash = await _sdkCore.PdfUpload(pdfFileName);
+                // string pdfFileName = null;
+                string hash = await _sdkCore.PdfUpload(tempPDFFilePath);
                 if (hash != null)
                 {
                     //rename local file
