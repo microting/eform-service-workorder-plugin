@@ -93,7 +93,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
             }
 
             string folderIdValue = _dbContext.PluginConfigurationValues
-                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:FolderId")?.Value;
+                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId")?.Value;
 
             int? folderId;
             if (string.IsNullOrEmpty(folderIdValue) || folderIdValue == "0")
@@ -165,7 +165,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 }
 
                 var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
-                string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == int.Parse(folderResult.Value))
+                string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == folderId)
                     .MicrotingUid.ToString();
 
                 MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
