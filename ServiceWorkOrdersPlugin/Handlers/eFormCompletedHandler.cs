@@ -171,6 +171,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
 
+                DateTime mockEndDate = new DateTime(2050, 1, 1);
+                mainElement.DisplayOrder = (int)(mockEndDate - workOrder.CorrectedAtLatest).TotalDays;
+
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 dataElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Description.InderValue = "Corrected at the latest: ";
