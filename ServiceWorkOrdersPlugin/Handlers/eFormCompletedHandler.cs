@@ -284,7 +284,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
-                    await _sdkCore.CaseDelete(wotToDelete.CaseUId);
+                    await _sdkCore.CaseDelete(wotToDelete.CaseId);
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
                     await wotToDelete.Update(_dbContext);
                 }
@@ -359,7 +359,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 image.Resize(newWidth, newHeight);
                 image.Crop(newWidth, newHeight);
-
+                if (newWidth > newHeight)
+                {
+                    image.Rotate(90);
+                }
                 var base64String = image.ToBase64();
                 itemsHtml +=
                     $@"<p><img src=""data:image/png;base64,{base64String}"" width=""{imageWidth}px"" alt="""" /></p>";
