@@ -174,8 +174,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
                 mainElement.CheckListFolderName = folderMicrotingUid;
 
-                DateTime mockEndDate = new DateTime(2050, 1, 1);
-                mainElement.DisplayOrder = (mockEndDate - workOrder.CorrectedAtLatest).Days;
+                DateTime startDate = new DateTime(2020, 1, 1);
+                mainElement.DisplayOrder = (workOrder.CorrectedAtLatest - startDate).Days;
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
