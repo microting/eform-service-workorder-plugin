@@ -284,7 +284,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
-                    await _sdkCore.CaseDelete(wotToDelete.CaseUId);
+                    await _sdkCore.CaseDelete(wotToDelete.CaseId);
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
                     await wotToDelete.Update(_dbContext);
                 }
