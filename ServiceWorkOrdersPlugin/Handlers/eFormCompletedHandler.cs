@@ -362,6 +362,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 image.Resize(newWidth, newHeight);
                 image.Crop(newWidth, newHeight);
+                image.AutoOrient();
 
                 var base64String = image.ToBase64();
                 itemsHtml +=
