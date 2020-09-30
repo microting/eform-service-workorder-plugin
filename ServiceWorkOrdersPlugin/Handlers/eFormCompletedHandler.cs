@@ -180,10 +180,11 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Label = fields[1].FieldValues[0].Value;
-                dataElement.Description.InderValue = "Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
+                dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
                     ? ""
                     : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                dataElement.Description.InderValue += "</strong>";
 
                 dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
 
