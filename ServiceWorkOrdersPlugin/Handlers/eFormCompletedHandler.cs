@@ -296,13 +296,16 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach (FieldValue fieldValue in fields[3].FieldValues)
                         {
-                            var pictureOfTask = new PicturesOfTaskDone
+                            if (fieldValue.UploadedDataObj != null)
                             {
-                                FileName = fieldValue.UploadedDataObj.FileName,
-                                WorkOrderId = workOrder.Id,
-                            };
+                                var pictureOfTask = new PicturesOfTaskDone
+                                {
+                                    FileName = fieldValue.UploadedDataObj.FileName,
+                                    WorkOrderId = workOrder.Id,
+                                };
 
-                            await pictureOfTask.Create(_dbContext);
+                                await pictureOfTask.Create(_dbContext);
+                            }
                         }
                     }
 
