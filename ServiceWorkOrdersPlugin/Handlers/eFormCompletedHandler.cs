@@ -283,6 +283,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
                 {
+                    await _sdkCore.CaseDelete(wotToDelete.CaseUId);
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
                     await wotToDelete.Update(_dbContext);
                 }
@@ -306,12 +307,18 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     if (!string.IsNullOrEmpty(fields[4]?.FieldValues[0]?.Value))
                     {
-                        workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;
+                        if (string.IsNullOrEmpty(workOrder.DescriptionOfTaskDone))
+                        {
+                            workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;
+                        }
                     }
 
                     // Add pictures, checkbox
-                    workOrder.DoneBySiteId = message.SiteId;
-                    workOrder.DoneAt = DateTime.UtcNow;
+                    if (workOrder.DoneAt == null)
+                    {
+                        workOrder.DoneBySiteId = message.SiteId;
+                        workOrder.DoneAt = DateTime.UtcNow;
+                    }
                     await workOrder.Update(_dbContext);
                 }
             }
