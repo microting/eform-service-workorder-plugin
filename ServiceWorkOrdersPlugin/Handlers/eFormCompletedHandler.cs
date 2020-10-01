@@ -356,13 +356,19 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
             using (var image = new MagickImage(stream))
             {
+                var profile = image.GetExifProfile();
+                // Write all values to the console
+                foreach (var value in profile.Values)
+                {
+                    Console.WriteLine("{0}({1}): {2}", value.Tag, value.DataType, value.ToString());
+                }
+                image.AutoOrient();
                 decimal currentRation = image.Height / (decimal)image.Width;
                 int newWidth = imageSize;
                 int newHeight = (int)Math.Round((currentRation * newWidth));
 
                 image.Resize(newWidth, newHeight);
                 image.Crop(newWidth, newHeight);
-                image.AutoOrient();
 
                 var base64String = image.ToBase64();
                 itemsHtml +=
