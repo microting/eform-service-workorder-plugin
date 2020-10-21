@@ -116,6 +116,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
             if (message.CheckId == newTaskId)
             {
                 WorkOrder workOrder = new WorkOrder();
+                workOrder.MicrotingId = message.MicrotingId;
+                workOrder.CheckUId = message.CheckUId;
+                workOrder.CheckId = message.CheckId;
 
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
                 ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
