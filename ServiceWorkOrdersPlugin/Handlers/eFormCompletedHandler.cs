@@ -257,13 +257,14 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 foreach (AssignedSite site in sites)
                 {
                     int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
-                    var wotCase = new WorkOrdersTemplateCases()
+                    var wotCase = new WorkOrdersTemplateCase()
                     {
                         CheckId = message.CheckId,
                         CheckUId = message.CheckUId,
                         WorkOrderId = workOrder.Id,
                         CaseId = (int) caseId,
-                        CaseUId = message.MicrotingId
+                        CaseUId = message.MicrotingId,
+                        SdkSiteId = site.SiteId
                     };
                     await wotCase.Create(_dbContext);
                 }
@@ -272,7 +273,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
             {
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createTaskListEFormId");
 
-                WorkOrdersTemplateCases workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                WorkOrdersTemplateCase workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                     x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
 
                 WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
@@ -281,11 +282,11 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
-                List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                List<WorkOrdersTemplateCase> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                             x.WorkOrderId == workOrdersTemplate.WorkOrderId &&
                             x.CaseId != message.MicrotingId).ToListAsync();
 
-                foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
+                foreach(WorkOrdersTemplateCase wotToDelete in wotListToDelete)
                 {
                     await _sdkCore.CaseDelete(wotToDelete.CaseId);
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
