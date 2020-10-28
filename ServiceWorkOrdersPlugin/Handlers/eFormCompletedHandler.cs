@@ -182,6 +182,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
+                mainElement.PushMessageTitle = mainElement.Label;
+                mainElement.PushMessageBody = string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                    ? ""
+                    : "Senest udbedret d.: " + DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
                 dataElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
