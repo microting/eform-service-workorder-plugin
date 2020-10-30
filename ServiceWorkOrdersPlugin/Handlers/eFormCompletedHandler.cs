@@ -116,6 +116,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
             if (message.CheckId == newTaskId)
             {
                 WorkOrder workOrder = new WorkOrder();
+                workOrder.MicrotingId = message.MicrotingId;
+                workOrder.CheckUId = message.CheckUId;
+                workOrder.CheckId = message.CheckId;
 
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
                 ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
@@ -174,11 +177,15 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 mainElement.StartDate = DateTime.Now.ToUniversalTime();
                 mainElement.CheckListFolderName = folderMicrotingUid;
 
-                DateTime mockEndDate = new DateTime(2050, 1, 1);
-                mainElement.DisplayOrder = (mockEndDate - workOrder.CorrectedAtLatest).Days;
+                DateTime startDate = new DateTime(2020, 1, 1);
+                mainElement.DisplayOrder = (workOrder.CorrectedAtLatest - startDate).Days;
 
                 DataElement dataElement = (DataElement)mainElement.ElementList[0];
                 mainElement.Label = fields[1].FieldValues[0].Value;
+                mainElement.PushMessageTitle = mainElement.Label;
+                mainElement.PushMessageBody = string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                    ? ""
+                    : "Senest udbedret d.: " + DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
                 dataElement.Label = fields[1].FieldValues[0].Value;
                 dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
                 dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
@@ -254,13 +261,14 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 foreach (AssignedSite site in sites)
                 {
                     int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
-                    var wotCase = new WorkOrdersTemplateCases()
+                    var wotCase = new WorkOrdersTemplateCase()
                     {
                         CheckId = message.CheckId,
                         CheckUId = message.CheckUId,
                         WorkOrderId = workOrder.Id,
                         CaseId = (int) caseId,
-                        CaseUId = message.MicrotingId
+                        CaseUId = message.MicrotingId,
+                        SdkSiteId = site.SiteId
                     };
                     await wotCase.Create(_dbContext);
                 }
@@ -269,7 +277,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
             {
                 Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createTaskListEFormId");
 
-                WorkOrdersTemplateCases workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                WorkOrdersTemplateCase workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                     x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
 
                 WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
@@ -278,11 +286,11 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                 List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
-                List<WorkOrdersTemplateCases> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                List<WorkOrdersTemplateCase> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
                             x.WorkOrderId == workOrdersTemplate.WorkOrderId &&
                             x.CaseId != message.MicrotingId).ToListAsync();
 
-                foreach(WorkOrdersTemplateCases wotToDelete in wotListToDelete)
+                foreach(WorkOrdersTemplateCase wotToDelete in wotListToDelete)
                 {
                     await _sdkCore.CaseDelete(wotToDelete.CaseId);
                     wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
@@ -296,13 +304,16 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         foreach (FieldValue fieldValue in fields[3].FieldValues)
                         {
-                            var pictureOfTask = new PicturesOfTaskDone
+                            if (fieldValue.UploadedDataObj != null)
                             {
-                                FileName = fieldValue.UploadedDataObj.FileName,
-                                WorkOrderId = workOrder.Id,
-                            };
+                                var pictureOfTask = new PicturesOfTaskDone
+                                {
+                                    FileName = fieldValue.UploadedDataObj.FileName,
+                                    WorkOrderId = workOrder.Id,
+                                };
 
-                            await pictureOfTask.Create(_dbContext);
+                                await pictureOfTask.Create(_dbContext);
+                            }
                         }
                     }
 
@@ -353,6 +364,13 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
             using (var image = new MagickImage(stream))
             {
+                var profile = image.GetExifProfile();
+                // Write all values to the console
+                foreach (var value in profile.Values)
+                {
+                    Console.WriteLine("{0}({1}): {2}", value.Tag, value.DataType, value.ToString());
+                }
+                // image.AutoOrient();
                 decimal currentRation = image.Height / (decimal)image.Width;
                 int newWidth = imageSize;
                 int newHeight = (int)Math.Round((currentRation * newWidth));
