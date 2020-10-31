@@ -27,8 +27,8 @@
     <PackageReference Include="Microting.WindowsService.BasePn" Version="2.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.2" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
-    <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.39" />
-    <PackageReference Include="Microting.WorkOrderBase" Version="1.0.30" />
+    <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.40" />
+    <PackageReference Include="Microting.WorkOrderBase" Version="1.0.31" />
     <PackageReference Include="HtmlToOpenXml.dll" Version="2.1.0" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
   </ItemGroup>
