@@ -85,15 +85,22 @@ namespace ServiceWorkOrdersPlugin
 
         public void CaseCompleted(object sender, EventArgs args)
         {
-            CaseDto trigger = (CaseDto)sender;
-
-            if (trigger.MicrotingUId != null && trigger.CheckUId != null)
+            try
             {
-                int caseId = (int)trigger.MicrotingUId;
-                int checkListId = (int)trigger.CheckListId;
-                int checkUId = (int) trigger.CheckUId;
-                int siteId = (int) trigger.SiteUId;
-                _bus.SendLocal(new eFormCompleted(caseId, checkListId, checkUId, siteId));
+                CaseDto trigger = (CaseDto) sender;
+
+                if (trigger.MicrotingUId != null && trigger.CheckUId != null)
+                {
+                    int caseId = (int) trigger.MicrotingUId;
+                    int checkListId = (int) trigger.CheckListId;
+                    int checkUId = (int) trigger.CheckUId;
+                    int siteId = (int) trigger.SiteUId;
+                    _bus.SendLocal(new eFormCompleted(caseId, checkListId, checkUId, siteId));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERR] ServiceWorkOrdersPlugin.CaseCompleted: Got the following error: {ex.Message}");
             }
         }
 

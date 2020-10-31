@@ -59,280 +59,287 @@ namespace ServiceWorkOrdersPlugin.Handlers
         {
             Console.WriteLine("[INF] EFormCompletedHandler.Handle: called");
 
-            _s3Enabled = _sdkCore.GetSdkSetting(Settings.s3Enabled).Result.ToLower() == "true";
-            _swiftEnabled = _sdkCore.GetSdkSetting(Settings.swiftEnabled).Result.ToLower() == "true";
-            string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
-
-            // Docx and PDF files
-            string timeStamp = DateTime.UtcNow.ToString("yyyyMMdd") + "_" + DateTime.UtcNow.ToString("hhmmss");
-            string docxFileName = $"{timeStamp}{message.SiteId}_temp.docx";
-            string tempPDFFileName = $"{timeStamp}{message.SiteId}_temp.pdf";
-            string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
-
-
-            string newTaskIdValue = _dbContext.PluginConfigurationValues
-                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:NewTaskId")?.Value;
-
-            bool newTaskIdParseResult = int.TryParse(newTaskIdValue, out int newTaskId);
-            if (!newTaskIdParseResult)
+            try
             {
-                const string errorMessage = "[ERROR] New task eform id not found in setting";
-                Console.WriteLine(errorMessage);
-                throw new Exception(errorMessage);
-            }
+                _s3Enabled = _sdkCore.GetSdkSetting(Settings.s3Enabled).Result.ToLower() == "true";
+                _swiftEnabled = _sdkCore.GetSdkSetting(Settings.swiftEnabled).Result.ToLower() == "true";
+                string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
 
-            string taskListIdValue = _dbContext.PluginConfigurationValues
-                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:TaskListId")?.Value;
+                // Docx and PDF files
+                string timeStamp = DateTime.UtcNow.ToString("yyyyMMdd") + "_" + DateTime.UtcNow.ToString("hhmmss");
+                string docxFileName = $"{timeStamp}{message.SiteId}_temp.docx";
+                string tempPDFFileName = $"{timeStamp}{message.SiteId}_temp.pdf";
+                string tempPDFFilePath = Path.Combine(downloadPath, tempPDFFileName);
 
-            bool taskListIdParseResult = int.TryParse(taskListIdValue, out int taskListId);
-            if (!taskListIdParseResult)
-            {
-                const string errorMessage = "[ERROR] Task list eform id not found in setting";
-                Console.WriteLine(errorMessage);
-                throw new Exception(errorMessage);
-            }
 
-            string folderIdValue = _dbContext.PluginConfigurationValues
-                .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId")?.Value;
+                string newTaskIdValue = _dbContext.PluginConfigurationValues
+                    .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:NewTaskId")?.Value;
 
-            int? folderId;
-            if (string.IsNullOrEmpty(folderIdValue) || folderIdValue == "0")
-            {
-                folderId = null;
-            }
-            else
-            {
-                bool folderIdParseResult = int.TryParse(folderIdValue, out int result);
-                if (!folderIdParseResult)
+                bool newTaskIdParseResult = int.TryParse(newTaskIdValue, out int newTaskId);
+                if (!newTaskIdParseResult)
                 {
-                    var errorMessage = $"[ERROR] Folder id parse error. folderIdValue: {folderIdValue}";
+                    const string errorMessage = "[ERROR] New task eform id not found in setting";
                     Console.WriteLine(errorMessage);
                     throw new Exception(errorMessage);
                 }
 
-                folderId = result;
-            }
+                string taskListIdValue = _dbContext.PluginConfigurationValues
+                    .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:TaskListId")?.Value;
 
-            if (message.CheckId == newTaskId)
-            {
-                WorkOrder workOrder = new WorkOrder();
-                workOrder.MicrotingId = message.MicrotingId;
-                workOrder.CheckUId = message.CheckUId;
-                workOrder.CheckId = message.CheckId;
-
-                Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
-                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
-                CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
-                List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
-
-                var picturesOfTasks = new List<string>();
-                if (fields.Any())
+                bool taskListIdParseResult = int.TryParse(taskListIdValue, out int taskListId);
+                if (!taskListIdParseResult)
                 {
-                    // field[0] - picture of the task
-                    if (!string.IsNullOrEmpty(fields[1]?.FieldValues[0]?.Value))
+                    const string errorMessage = "[ERROR] Task list eform id not found in setting";
+                    Console.WriteLine(errorMessage);
+                    throw new Exception(errorMessage);
+                }
+
+                string folderIdValue = _dbContext.PluginConfigurationValues
+                    .SingleOrDefault(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId")?.Value;
+
+                int? folderId;
+                if (string.IsNullOrEmpty(folderIdValue) || folderIdValue == "0")
+                {
+                    folderId = null;
+                }
+                else
+                {
+                    bool folderIdParseResult = int.TryParse(folderIdValue, out int result);
+                    if (!folderIdParseResult)
                     {
-                        workOrder.Description = fields[1].FieldValues[0].Value;
+                        var errorMessage = $"[ERROR] Folder id parse error. folderIdValue: {folderIdValue}";
+                        Console.WriteLine(errorMessage);
+                        throw new Exception(errorMessage);
                     }
 
-                    if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
-                    {
-                        workOrder.CorrectedAtLatest = DateTime.Parse(fields[2].FieldValues[0].Value);
-                    }
+                    folderId = result;
+                }
 
-                    if(fields[0].FieldValues.Count > 0)
+                if (message.CheckId == newTaskId)
+                {
+                    WorkOrder workOrder = new WorkOrder();
+                    workOrder.MicrotingId = message.MicrotingId;
+                    workOrder.CheckUId = message.CheckUId;
+                    workOrder.CheckId = message.CheckId;
+
+                    Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
+                    ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
+                    CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
+                    List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
+
+                    var picturesOfTasks = new List<string>();
+                    if (fields.Any())
                     {
-                        foreach(FieldValue fieldValue in fields[0].FieldValues)
+                        // field[0] - picture of the task
+                        if (!string.IsNullOrEmpty(fields[1]?.FieldValues[0]?.Value))
                         {
-                            if (fieldValue.UploadedDataObj != null)
-                            {
-                                picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
-                            }
+                            workOrder.Description = fields[1].FieldValues[0].Value;
                         }
-                    }
-                }
 
-                workOrder.CreatedAt = DateTime.UtcNow;
-                workOrder.CreatedByUserId = replyElement.SiteMicrotingUuid;
-                workOrder.WorkflowState = Constants.WorkflowStates.Created;
-                await workOrder.Create(_dbContext);
-
-                foreach (var picturesOfTask in picturesOfTasks)
-                {
-                    var pictureOfTask = new PicturesOfTask
-                    {
-                        FileName = picturesOfTask,
-                        WorkOrderId = workOrder.Id,
-                    };
-
-                    await pictureOfTask.Create(_dbContext);
-                }
-
-                var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
-                string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == folderId)
-                    .MicrotingUid.ToString();
-
-                MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
-                mainElement.Repeated = 1;
-                mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
-                mainElement.StartDate = DateTime.Now.ToUniversalTime();
-                mainElement.CheckListFolderName = folderMicrotingUid;
-
-                DateTime startDate = new DateTime(2020, 1, 1);
-                mainElement.DisplayOrder = (workOrder.CorrectedAtLatest - startDate).Days;
-
-                DataElement dataElement = (DataElement)mainElement.ElementList[0];
-                mainElement.Label = fields[1].FieldValues[0].Value;
-                mainElement.PushMessageTitle = mainElement.Label;
-                mainElement.PushMessageBody = string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
-                    ? ""
-                    : "Senest udbedret d.: " + DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
-                dataElement.Label = fields[1].FieldValues[0].Value;
-                dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
-                dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
-                    ? ""
-                    : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
-                dataElement.Description.InderValue += "</strong>";
-
-                dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
-
-                // Read html and template
-                var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
-                var assembly = Assembly.GetExecutingAssembly();
-                string html;
-                await using (var resourceStream = assembly.GetManifestResourceStream(resourceString))
-                {
-                    using var reader = new StreamReader(resourceStream ?? throw new InvalidOperationException($"{nameof(resourceStream)} is null"));
-                    html = await reader.ReadToEndAsync();
-                }
-
-                // Read docx stream
-                resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.file.docx";
-                var docxFileResourceStream = assembly.GetManifestResourceStream(resourceString);
-                if (docxFileResourceStream == null)
-                {
-                    throw new InvalidOperationException($"{nameof(docxFileResourceStream)} is null");
-                }
-
-                var docxFileStream = new MemoryStream();
-                await docxFileResourceStream.CopyToAsync(docxFileStream);
-                await docxFileResourceStream.DisposeAsync();
-                string basePicturePath = await _sdkCore.GetSdkSetting(Settings.fileLocationPicture);
-                var word = new WordProcessor(docxFileStream);
-                string imagesHtml = "";
-
-                foreach (var imagesName in picturesOfTasks)
-                {
-                    imagesHtml = await InsertImage(imagesName, imagesHtml, 700, 650, basePicturePath);
-                }
-
-                html = html.Replace("{%Content%}", imagesHtml);
-
-                word.AddHtml(html);
-                word.Dispose();
-                docxFileStream.Position = 0;
-
-                // Build docx
-                await using (var docxFile = new FileStream(docxFileName, FileMode.Create, FileAccess.Write))
-                {
-                    docxFileStream.WriteTo(docxFile);
-                }
-
-                // Convert to PDF
-                ReportHelper.ConvertToPdf(docxFileName, downloadPath);
-                File.Delete(docxFileName);
-
-                // Upload PDF
-                // string pdfFileName = null;
-                string hash = await _sdkCore.PdfUpload(tempPDFFilePath);
-                if (hash != null)
-                {
-                    //rename local file
-                    FileInfo fileInfo = new FileInfo(tempPDFFilePath);
-                    fileInfo.CopyTo(downloadPath + hash + ".pdf", true);
-                    fileInfo.Delete();
-                    await _sdkCore.PutFileToStorageSystem(Path.Combine(downloadPath, $"{hash}.pdf"), $"{hash}.pdf");
-
-                    // TODO Remove from file storage?
-
-                    ((ShowPdf)dataElement.DataItemList[1]).Value = hash;
-                }
-
-                List<AssignedSite> sites = await _dbContext.AssignedSites.Where(x => x.WorkflowState != Constants.WorkflowStates.Removed).ToListAsync();
-                foreach (AssignedSite site in sites)
-                {
-                    int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
-                    var wotCase = new WorkOrdersTemplateCase()
-                    {
-                        CheckId = message.CheckId,
-                        CheckUId = message.CheckUId,
-                        WorkOrderId = workOrder.Id,
-                        CaseId = (int) caseId,
-                        CaseUId = message.MicrotingId,
-                        SdkSiteId = site.SiteId
-                    };
-                    await wotCase.Create(_dbContext);
-                }
-            }
-            else if (message.CheckId == taskListId)
-            {
-                Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createTaskListEFormId");
-
-                WorkOrdersTemplateCase workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
-                    x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
-
-                WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
-
-                ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
-                CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
-                List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
-
-                List<WorkOrdersTemplateCase> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
-                            x.WorkOrderId == workOrdersTemplate.WorkOrderId &&
-                            x.CaseId != message.MicrotingId).ToListAsync();
-
-                foreach(WorkOrdersTemplateCase wotToDelete in wotListToDelete)
-                {
-                    await _sdkCore.CaseDelete(wotToDelete.CaseId);
-                    wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
-                    await wotToDelete.Update(_dbContext);
-                }
-
-                if (fields.Any())
-                {
-                    // field[3] - pictures of the done task
-                    if (fields[3].FieldValues.Count > 0)
-                    {
-                        foreach (FieldValue fieldValue in fields[3].FieldValues)
+                        if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
                         {
-                            if (fieldValue.UploadedDataObj != null)
+                            workOrder.CorrectedAtLatest = DateTime.Parse(fields[2].FieldValues[0].Value);
+                        }
+
+                        if(fields[0].FieldValues.Count > 0)
+                        {
+                            foreach(FieldValue fieldValue in fields[0].FieldValues)
                             {
-                                var pictureOfTask = new PicturesOfTaskDone
+                                if (fieldValue.UploadedDataObj != null)
                                 {
-                                    FileName = fieldValue.UploadedDataObj.FileName,
-                                    WorkOrderId = workOrder.Id,
-                                };
-
-                                await pictureOfTask.Create(_dbContext);
+                                    picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
+                                }
                             }
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(fields[4]?.FieldValues[0]?.Value))
+                    workOrder.CreatedAt = DateTime.UtcNow;
+                    workOrder.CreatedByUserId = replyElement.SiteMicrotingUuid;
+                    workOrder.WorkflowState = Constants.WorkflowStates.Created;
+                    await workOrder.Create(_dbContext);
+
+                    foreach (var picturesOfTask in picturesOfTasks)
                     {
-                        if (string.IsNullOrEmpty(workOrder.DescriptionOfTaskDone))
+                        var pictureOfTask = new PicturesOfTask
                         {
-                            workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;
-                        }
+                            FileName = picturesOfTask,
+                            WorkOrderId = workOrder.Id,
+                        };
+
+                        await pictureOfTask.Create(_dbContext);
                     }
 
-                    // Add pictures, checkbox
-                    if (workOrder.DoneAt == null)
+                    var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
+                    string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == folderId)
+                        .MicrotingUid.ToString();
+
+                    MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
+                    mainElement.Repeated = 1;
+                    mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
+                    mainElement.StartDate = DateTime.Now.ToUniversalTime();
+                    mainElement.CheckListFolderName = folderMicrotingUid;
+
+                    DateTime startDate = new DateTime(2020, 1, 1);
+                    mainElement.DisplayOrder = (workOrder.CorrectedAtLatest - startDate).Days;
+
+                    DataElement dataElement = (DataElement)mainElement.ElementList[0];
+                    mainElement.Label = fields[1].FieldValues[0].Value;
+                    mainElement.PushMessageTitle = mainElement.Label;
+                    mainElement.PushMessageBody = string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                        ? ""
+                        : "Senest udbedret d.: " + DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                    dataElement.Label = fields[1].FieldValues[0].Value;
+                    dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
+                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                        ? ""
+                        : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                    dataElement.Description.InderValue += "</strong>";
+
+                    dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
+
+                    // Read html and template
+                    var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
+                    var assembly = Assembly.GetExecutingAssembly();
+                    string html;
+                    await using (var resourceStream = assembly.GetManifestResourceStream(resourceString))
                     {
-                        workOrder.DoneBySiteId = message.SiteId;
-                        workOrder.DoneAt = DateTime.UtcNow;
+                        using var reader = new StreamReader(resourceStream ?? throw new InvalidOperationException($"{nameof(resourceStream)} is null"));
+                        html = await reader.ReadToEndAsync();
                     }
-                    await workOrder.Update(_dbContext);
+
+                    // Read docx stream
+                    resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.file.docx";
+                    var docxFileResourceStream = assembly.GetManifestResourceStream(resourceString);
+                    if (docxFileResourceStream == null)
+                    {
+                        throw new InvalidOperationException($"{nameof(docxFileResourceStream)} is null");
+                    }
+
+                    var docxFileStream = new MemoryStream();
+                    await docxFileResourceStream.CopyToAsync(docxFileStream);
+                    await docxFileResourceStream.DisposeAsync();
+                    string basePicturePath = await _sdkCore.GetSdkSetting(Settings.fileLocationPicture);
+                    var word = new WordProcessor(docxFileStream);
+                    string imagesHtml = "";
+
+                    foreach (var imagesName in picturesOfTasks)
+                    {
+                        imagesHtml = await InsertImage(imagesName, imagesHtml, 700, 650, basePicturePath);
+                    }
+
+                    html = html.Replace("{%Content%}", imagesHtml);
+
+                    word.AddHtml(html);
+                    word.Dispose();
+                    docxFileStream.Position = 0;
+
+                    // Build docx
+                    await using (var docxFile = new FileStream(docxFileName, FileMode.Create, FileAccess.Write))
+                    {
+                        docxFileStream.WriteTo(docxFile);
+                    }
+
+                    // Convert to PDF
+                    ReportHelper.ConvertToPdf(docxFileName, downloadPath);
+                    File.Delete(docxFileName);
+
+                    // Upload PDF
+                    // string pdfFileName = null;
+                    string hash = await _sdkCore.PdfUpload(tempPDFFilePath);
+                    if (hash != null)
+                    {
+                        //rename local file
+                        FileInfo fileInfo = new FileInfo(tempPDFFilePath);
+                        fileInfo.CopyTo(downloadPath + hash + ".pdf", true);
+                        fileInfo.Delete();
+                        await _sdkCore.PutFileToStorageSystem(Path.Combine(downloadPath, $"{hash}.pdf"), $"{hash}.pdf");
+
+                        // TODO Remove from file storage?
+
+                        ((ShowPdf)dataElement.DataItemList[1]).Value = hash;
+                    }
+
+                    List<AssignedSite> sites = await _dbContext.AssignedSites.Where(x => x.WorkflowState != Constants.WorkflowStates.Removed).ToListAsync();
+                    foreach (AssignedSite site in sites)
+                    {
+                        int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
+                        var wotCase = new WorkOrdersTemplateCase()
+                        {
+                            CheckId = message.CheckId,
+                            CheckUId = message.CheckUId,
+                            WorkOrderId = workOrder.Id,
+                            CaseId = (int) caseId,
+                            CaseUId = message.MicrotingId,
+                            SdkSiteId = site.SiteId
+                        };
+                        await wotCase.Create(_dbContext);
+                    }
                 }
+                else if (message.CheckId == taskListId)
+                {
+                    Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createTaskListEFormId");
+
+                    WorkOrdersTemplateCase workOrdersTemplate = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                        x.CaseId == message.MicrotingId).FirstOrDefaultAsync();
+
+                    WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
+
+                    ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
+                    CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
+                    List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
+
+                    List<WorkOrdersTemplateCase> wotListToDelete = await _dbContext.WorkOrdersTemplateCases.Where(x =>
+                                x.WorkOrderId == workOrdersTemplate.WorkOrderId &&
+                                x.CaseId != message.MicrotingId).ToListAsync();
+
+                    foreach(WorkOrdersTemplateCase wotToDelete in wotListToDelete)
+                    {
+                        await _sdkCore.CaseDelete(wotToDelete.CaseId);
+                        wotToDelete.WorkflowState = Constants.WorkflowStates.Retracted;
+                        await wotToDelete.Update(_dbContext);
+                    }
+
+                    if (fields.Any())
+                    {
+                        // field[3] - pictures of the done task
+                        if (fields[3].FieldValues.Count > 0)
+                        {
+                            foreach (FieldValue fieldValue in fields[3].FieldValues)
+                            {
+                                if (fieldValue.UploadedDataObj != null)
+                                {
+                                    var pictureOfTask = new PicturesOfTaskDone
+                                    {
+                                        FileName = fieldValue.UploadedDataObj.FileName,
+                                        WorkOrderId = workOrder.Id,
+                                    };
+
+                                    await pictureOfTask.Create(_dbContext);
+                                }
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(fields[4]?.FieldValues[0]?.Value))
+                        {
+                            if (string.IsNullOrEmpty(workOrder.DescriptionOfTaskDone))
+                            {
+                                workOrder.DescriptionOfTaskDone = fields[4].FieldValues[0].Value;
+                            }
+                        }
+
+                        // Add pictures, checkbox
+                        if (workOrder.DoneAt == null)
+                        {
+                            workOrder.DoneBySiteId = message.SiteId;
+                            workOrder.DoneAt = DateTime.UtcNow;
+                        }
+                        await workOrder.Update(_dbContext);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERR] ServiceWorkOrdersPlugin.CaseCompleted: Got the following error: {ex.Message}");
             }
         }
 
