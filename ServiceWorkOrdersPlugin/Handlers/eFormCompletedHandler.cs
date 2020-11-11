@@ -149,7 +149,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                             {
                                 if (fieldValue.UploadedDataObj != null)
                                 {
-                                    picturesOfTasks.Add(fieldValue.UploadedDataObj.FileName);
+                                    picturesOfTasks.Add($"{fieldValue.UploadedDataObj.Id}_700_{fieldValue.UploadedDataObj.Checksum}.{fieldValue.UploadedDataObj.Extension}");
                                 }
                             }
                         }
@@ -235,6 +235,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     foreach (var imagesName in picturesOfTasks)
                     {
+                        Console.WriteLine($"Trying to insert image into document : {imagesName}");
                         imagesHtml = await InsertImage(imagesName, imagesHtml, 700, 650, basePicturePath);
                     }
 
@@ -388,17 +389,17 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 {
                     Console.WriteLine("{0}({1}): {2}", value.Tag, value.DataType, value.ToString());
                 }
-                // image.AutoOrient();
-                decimal currentRation = image.Height / (decimal)image.Width;
-                int newWidth = imageSize;
-                int newHeight = (int)Math.Round((currentRation * newWidth));
-
-                image.Resize(newWidth, newHeight);
-                image.Crop(newWidth, newHeight);
-                if (newWidth > newHeight)
-                {
-                    image.Rotate(90);
-                }
+                image.AutoOrient();
+                // decimal currentRation = image.Height / (decimal)image.Width;
+                // int newWidth = imageSize;
+                // int newHeight = (int)Math.Round((currentRation * newWidth));
+                //
+                // image.Resize(newWidth, newHeight);
+                // image.Crop(newWidth, newHeight);
+                // if (newWidth > newHeight)
+                // {
+                //     image.Rotate(90);
+                // }
                 var base64String = image.ToBase64();
                 itemsHtml +=
                     $@"<p><img src=""data:image/png;base64,{base64String}"" width=""{imageWidth}px"" alt="""" /></p>";
