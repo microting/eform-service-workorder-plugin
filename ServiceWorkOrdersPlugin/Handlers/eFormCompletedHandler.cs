@@ -133,9 +133,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     if (fields.Any())
                     {
                         // field[0] - picture of the task
-                        if (!string.IsNullOrEmpty(fields[1]?.FieldValues[0]?.Value))
+                        if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
                         {
-                            workOrder.Description = fields[1].FieldValues[0].Value;
+                            workOrder.Description = fields[3].FieldValues[0].Value;
                         }
 
                         if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
@@ -143,9 +143,9 @@ namespace ServiceWorkOrdersPlugin.Handlers
                             workOrder.CorrectedAtLatest = DateTime.Parse(fields[2].FieldValues[0].Value);
                         }
 
-                        if(fields[0].FieldValues.Count > 0)
+                        if(fields[2].FieldValues.Count > 0)
                         {
-                            foreach(FieldValue fieldValue in fields[0].FieldValues)
+                            foreach(FieldValue fieldValue in fields[2].FieldValues)
                             {
                                 if (fieldValue.UploadedDataObj != null)
                                 {
@@ -191,15 +191,15 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         ? ""
                         : "Udføres senest: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
                     dataElement.Label = fields[3].FieldValues[0].Value;
-                    dataElement.Description.InderValue += $"<strong>Område:</strong> {fields[0].FieldValues[0].Value}";
-                    dataElement.Description.InderValue += $"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].Value}";
-                    dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}";
+                    dataElement.Description.InderValue += $"<strong>Område:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
+                    dataElement.Description.InderValue += $"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
+                    dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}<br>";
                     dataElement.Description.InderValue += "<strong>Udføres senest:</strong>"; // Needs i18n support "Corrected at the latest:"
                     dataElement.Description.InderValue += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                         ? ""
                         : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
-                    dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
+                    dataElement.DataItemList[0].Description.InderValue = dataElement.Description.InderValue;
 
                     // Read html and template
                     var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
