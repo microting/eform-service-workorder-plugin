@@ -133,14 +133,14 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     if (fields.Any())
                     {
                         // field[0] - picture of the task
-                        if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
+                        if (!string.IsNullOrEmpty(fields[3]?.FieldValues[0]?.Value))
                         {
                             workOrder.Description = fields[3].FieldValues[0].Value;
                         }
 
-                        if (!string.IsNullOrEmpty(fields[2]?.FieldValues[0]?.Value))
+                        if (!string.IsNullOrEmpty(fields[4]?.FieldValues[0]?.Value))
                         {
-                            workOrder.CorrectedAtLatest = DateTime.Parse(fields[2].FieldValues[0].Value);
+                            workOrder.CorrectedAtLatest = DateTime.Parse(fields[4].FieldValues[0].Value);
                         }
 
                         if(fields[2].FieldValues.Count > 0)
@@ -200,6 +200,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
                     dataElement.DataItemList[0].Description.InderValue = dataElement.Description.InderValue;
+                    dataElement.DataItemList[0].Label = dataElement.Label;
 
                     // Read html and template
                     var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
