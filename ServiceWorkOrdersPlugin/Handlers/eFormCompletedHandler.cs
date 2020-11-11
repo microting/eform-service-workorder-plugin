@@ -124,6 +124,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
                     ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
+                    var doneBy = _sdkCore.dbContextHelper.GetDbContext().workers
+                        .Single(x => x.Id == replyElement.DoneById).full_name();
                     CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                     List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
 
@@ -183,17 +185,19 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     mainElement.DisplayOrder = (workOrder.CorrectedAtLatest - startDate).Days;
 
                     DataElement dataElement = (DataElement)mainElement.ElementList[0];
-                    mainElement.Label = fields[1].FieldValues[0].Value;
+                    mainElement.Label = fields[3].FieldValues[0].Value;
                     mainElement.PushMessageTitle = mainElement.Label;
-                    mainElement.PushMessageBody = string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                    mainElement.PushMessageBody = string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                         ? ""
-                        : "Senest udbedret d.: " + DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
-                    dataElement.Label = fields[1].FieldValues[0].Value;
-                    dataElement.Description.InderValue = "<strong>Senest udbedret d.: "; // Needs i18n support "Corrected at the latest:"
-                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[2].FieldValues[0].Value)
+                        : "Udføres senest: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                    dataElement.Label = fields[3].FieldValues[0].Value;
+                    dataElement.Description.InderValue += $"<strong>Område:</strong> {fields[0].FieldValues[0].Value}";
+                    dataElement.Description.InderValue += $"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].Value}";
+                    dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}";
+                    dataElement.Description.InderValue += "<strong>Udføres senest:</strong>"; // Needs i18n support "Corrected at the latest:"
+                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                         ? ""
-                        : DateTime.Parse(fields[2].FieldValues[0].Value).ToString("dd-MM-yyyy");
-                    dataElement.Description.InderValue += "</strong>";
+                        : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
 
                     dataElement.DataItemList[0].Description.InderValue = workOrder.Description;
 
