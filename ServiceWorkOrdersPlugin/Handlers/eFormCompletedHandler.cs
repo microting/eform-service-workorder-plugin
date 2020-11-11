@@ -149,7 +149,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                             {
                                 if (fieldValue.UploadedDataObj != null)
                                 {
-                                    picturesOfTasks.Add($"{fieldValue.UploadedDataObj.Id}_700_{fieldValue.UploadedDataObj.Checksum}.{fieldValue.UploadedDataObj.Extension}");
+                                    picturesOfTasks.Add($"{fieldValue.UploadedDataObj.Id}_700_{fieldValue.UploadedDataObj.Checksum}{fieldValue.UploadedDataObj.Extension}");
                                 }
                             }
                         }
