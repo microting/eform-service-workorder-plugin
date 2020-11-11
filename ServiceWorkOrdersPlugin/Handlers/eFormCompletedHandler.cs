@@ -389,7 +389,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 {
                     Console.WriteLine("{0}({1}): {2}", value.Tag, value.DataType, value.ToString());
                 }
-                image.AutoOrient();
+                //image.AutoOrient();
                 // decimal currentRation = image.Height / (decimal)image.Width;
                 // int newWidth = imageSize;
                 // int newHeight = (int)Math.Round((currentRation * newWidth));
@@ -398,7 +398,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 // image.Crop(newWidth, newHeight);
                 // if (newWidth > newHeight)
                 // {
-                //     image.Rotate(90);
+                     image.Rotate(90);
                 // }
                 var base64String = image.ToBase64();
                 itemsHtml +=
