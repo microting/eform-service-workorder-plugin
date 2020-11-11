@@ -158,6 +158,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     workOrder.CreatedAt = DateTime.UtcNow;
                     workOrder.CreatedByUserId = replyElement.SiteMicrotingUuid;
                     workOrder.WorkflowState = Constants.WorkflowStates.Created;
+                    workOrder.AssignedArea = fields[0].FieldValues[0].ValueReadable;
+                    workOrder.AssignedWorker = fields[1].FieldValues[0].ValueReadable;
                     await workOrder.Create(_dbContext);
 
                     foreach (var picturesOfTask in picturesOfTasks)
@@ -191,8 +193,12 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         ? ""
                         : "Udføres senest: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
                     dataElement.Label = fields[3].FieldValues[0].Value;
-                    dataElement.Description.InderValue += $"<strong>Område:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
-                    dataElement.Description.InderValue += $"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
+                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable)
+                        ? "" :
+                        $"<strong>Område:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
+                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[1].FieldValues[0].ValueReadable)
+                        ? ""
+                        :$"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
                     dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}<br>";
                     dataElement.Description.InderValue += "<strong>Udføres senest:</strong>"; // Needs i18n support "Corrected at the latest:"
                     dataElement.Description.InderValue += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
