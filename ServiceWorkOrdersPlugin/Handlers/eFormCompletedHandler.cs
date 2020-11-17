@@ -193,10 +193,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         ? ""
                         : "Udføres senest: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
                     dataElement.Label = fields[3].FieldValues[0].Value;
-                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable)
+                    dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable) || fields[0].FieldValues[0].ValueReadable == "null")
                         ? "" :
                         $"<strong>Område:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
-                    dataElement.Description.InderValue += string.IsNullOrEmpty(fields[1].FieldValues[0].ValueReadable)
+                    dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[1].FieldValues[0].ValueReadable) || fields[1].FieldValues[0].ValueReadable == "null")
                         ? ""
                         :$"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
                     dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}<br>";
