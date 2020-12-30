@@ -124,7 +124,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
                     ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId);
-                    var doneBy = _sdkCore.dbContextHelper.GetDbContext().workers
+                    var doneBy = _sdkCore.dbContextHelper.GetDbContext().Workers
                         .Single(x => x.Id == replyElement.DoneById).full_name();
                     CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                     List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
@@ -174,7 +174,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     }
 
                     var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
-                    string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().folders.Single(x => x.Id == folderId)
+                    string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().Folders.Single(x => x.Id == folderId)
                         .MicrotingUid.ToString();
 
                     MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
