@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License (MIT)
 
-Copyright (c) 2007 - 2020 Microting A/S
+Copyright (c) 2007 - 2021 Microting A/S
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -177,7 +177,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().Folders.Single(x => x.Id == folderId)
                         .MicrotingUid.ToString();
 
-                    MainElement mainElement = await _sdkCore.TemplateRead(taskListId);
+                    MainElement mainElement = await _sdkCore.ReadeForm(taskListId);
                     mainElement.Repeated = 1;
                     mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
                     mainElement.StartDate = DateTime.Now.ToUniversalTime();
