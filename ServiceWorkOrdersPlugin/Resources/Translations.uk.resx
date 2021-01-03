@@ -1,0 +1,26 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="DontAtTheLatst" xml:space="preserve">
+        <value>Виконується найпізніше</value>
+    </data>
+    <data name="TaskCreatedBy" xml:space="preserve">
+        <value>Завдання, створене користувачем</value>
+    </data>
+    <data name="Area" xml:space="preserve">
+        <value>Площа</value>
+    </data>
+    <data name="AssignedTo" xml:space="preserve">
+        <value>Присвоєно</value>
+    </data>
+</root>

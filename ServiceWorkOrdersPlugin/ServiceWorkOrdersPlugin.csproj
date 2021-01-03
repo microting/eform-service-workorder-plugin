@@ -17,6 +17,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Templates\file.docx" />
     <EmbeddedResource Include="Resources\Templates\page.html" />
+    <EmbeddedResource Update="Resources\Translations.da.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Translations.da.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Translations.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Translations.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 
@@ -30,6 +38,20 @@
     <PackageReference Include="Microting.WorkOrderBase" Version="1.0.58" />
     <PackageReference Include="HtmlToOpenXml.dll" Version="2.1.0" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Compile Update="Resources\Translations.da.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Translations.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Translations.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Translations.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -44,6 +44,9 @@ using ServiceWorkOrdersPlugin.Infrastructure.Helpers;
 using CheckListValue = Microting.eForm.Infrastructure.Models.CheckListValue;
 using Field = Microting.eForm.Infrastructure.Models.Field;
 using FieldValue = Microting.eForm.Infrastructure.Models.FieldValue;
+using System.Globalization;
+using System.Threading;
+using ServiceWorkOrdersPlugin.Resources;
 
 namespace ServiceWorkOrdersPlugin.Handlers
 {
@@ -249,6 +252,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.Id == site.SiteId);
                         Language language = await sdkDbContext.Languages.SingleAsync(x => x.Id == sdkSite.LanguageId);
+                        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(language.LanguageCode);
                         MainElement mainElement = await _sdkCore.ReadeForm(taskListId, language);
                         mainElement.Repeated = 1;
                         mainElement.EndDate = DateTime.Now.AddYears(10).ToUniversalTime();
@@ -263,16 +267,16 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         mainElement.PushMessageTitle = mainElement.Label;
                         mainElement.PushMessageBody = string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                             ? ""
-                            : "Udføres senest: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                            : $"{Translations.DontAtTheLatst}: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
                         dataElement.Label = fields[3].FieldValues[0].Value;
                         dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable) || fields[0].FieldValues[0].ValueReadable == "null")
                             ? "" :
-                            $"<strong>Område:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
+                            $"<strong>{Translations.Area}:</strong> {fields[0].FieldValues[0].ValueReadable}<br>";
                         dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[1].FieldValues[0].ValueReadable) || fields[1].FieldValues[0].ValueReadable == "null")
                             ? ""
-                            :$"<strong>Tildelt til:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
-                        dataElement.Description.InderValue += $"<strong>Oprettet af:</strong> {doneBy}<br>";
-                        dataElement.Description.InderValue += "<strong>Udføres senest:</strong>"; // Needs i18n support "Corrected at the latest:"
+                            :$"<strong>{Translations.AssignedTo}:</strong> {fields[1].FieldValues[0].ValueReadable}<br>";
+                        dataElement.Description.InderValue += $"<strong>{Translations.TaskCreatedBy}:</strong> {doneBy}<br>";
+                        dataElement.Description.InderValue += $"<strong>{Translations.DontAtTheLatst}:</strong>"; // Needs i18n support "Corrected at the latest:"
                         dataElement.Description.InderValue += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                             ? ""
                             : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
