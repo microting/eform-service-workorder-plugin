@@ -36,7 +36,7 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
     <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.65" />
     <PackageReference Include="Microting.WorkOrderBase" Version="1.0.61" />
-    <PackageReference Include="HtmlToOpenXml.dll" Version="2.1.0" />
+    <PackageReference Include="HtmlToOpenXml.dll" Version="2.2.0" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
   </ItemGroup>
 
