@@ -253,7 +253,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     await using MicrotingDbContext sdkDbContext = _sdkCore.dbContextHelper.GetDbContext();
                     foreach (AssignedSite site in sites)
                     {
-                        Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.MicrotingUid == site.SiteId);
+                        Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.MicrotingUid == site.SiteMicrotingUid);
                         language = await sdkDbContext.Languages.SingleAsync(x => x.Id == sdkSite.LanguageId);
                         Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(language.LanguageCode);
                         MainElement mainElement = await _sdkCore.ReadeForm(taskListId, language);
@@ -295,7 +295,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                             ((ShowPdf)dataElement.DataItemList[1]).Value = hash;
                         }
 
-                        int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteId, folderId);
+                        int? caseId = await _sdkCore.CaseCreate(mainElement, "", site.SiteMicrotingUid, folderId);
                         var wotCase = new WorkOrdersTemplateCase()
                         {
                             CheckId = message.CheckId,
@@ -303,7 +303,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                             WorkOrderId = workOrder.Id,
                             CaseId = (int) caseId,
                             CaseUId = message.MicrotingId,
-                            SdkSiteId = site.SiteId
+                            SdkSiteId = site.SiteMicrotingUid
                         };
                         await wotCase.Create(_dbContext);
                     }
