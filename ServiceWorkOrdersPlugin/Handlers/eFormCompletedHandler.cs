@@ -127,7 +127,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                 {
                     WorkOrder workOrder = new WorkOrder();
                     workOrder.MicrotingId = message.MicrotingId;
-                    workOrder.CheckUId = message.CheckUId;
+                    workOrder.CheckMicrotingUid = message.CheckUId;
                     workOrder.CheckId = message.CheckId;
 
                     Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
@@ -299,11 +299,11 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         var wotCase = new WorkOrdersTemplateCase()
                         {
                             CheckId = message.CheckId,
-                            CheckUId = message.CheckUId,
+                            CheckMicrotingUid = message.CheckUId,
                             WorkOrderId = workOrder.Id,
                             CaseId = (int) caseId,
-                            CaseUId = message.MicrotingId,
-                            SdkSiteId = site.SiteMicrotingUid
+                            CaseMicrotingUid = message.MicrotingId,
+                            SdkSiteMicrotingUid = site.SiteMicrotingUid
                         };
                         await wotCase.Create(_dbContext);
                     }
