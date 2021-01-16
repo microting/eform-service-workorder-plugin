@@ -253,7 +253,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     await using MicrotingDbContext sdkDbContext = _sdkCore.dbContextHelper.GetDbContext();
                     foreach (AssignedSite site in sites)
                     {
-                        Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.Id == site.SiteId);
+                        Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.MicrotingUid == site.SiteId);
                         language = await sdkDbContext.Languages.SingleAsync(x => x.Id == sdkSite.LanguageId);
                         Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(language.LanguageCode);
                         MainElement mainElement = await _sdkCore.ReadeForm(taskListId, language);
