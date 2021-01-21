@@ -122,6 +122,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     folderId = result;
                 }
+                await using MicrotingDbContext sdkDbContext = _sdkCore.DbContextHelper.GetDbContext();
 
                 if (message.CheckId == newTaskId)
                 {
@@ -132,10 +133,10 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     Console.WriteLine("[INF] EFormCompletedHandler.Handle: message.CheckId == createNewTaskEFormId");
 
-                    Language language = await _sdkCore.dbContextHelper.GetDbContext().Languages
+                    Language language = await sdkDbContext.Languages
                         .SingleAsync(x => x.LanguageCode == "da");
                     ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId, language);
-                    var doneBy = _sdkCore.dbContextHelper.GetDbContext().Workers
+                    var doneBy = sdkDbContext.Workers
                         .Single(x => x.Id == replyElement.DoneById).full_name();
                     CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
                     List<Field> fields = checkListValue.DataItemList.Select(di => di as Field).ToList();
@@ -185,7 +186,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     }
 
                     var folderResult = await _dbContext.PluginConfigurationValues.SingleAsync(x => x.Name == "WorkOrdersBaseSettings:FolderTasksId");
-                    string folderMicrotingUid = _sdkCore.dbContextHelper.GetDbContext().Folders.Single(x => x.Id == folderId)
+                    string folderMicrotingUid = sdkDbContext.Folders.Single(x => x.Id == folderId)
                         .MicrotingUid.ToString();
                     var resourceString = "ServiceWorkOrdersPlugin.Resources.Templates.page.html";
                     var assembly = Assembly.GetExecutingAssembly();
@@ -250,7 +251,6 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     }
 
                     List<AssignedSite> sites = await _dbContext.AssignedSites.Where(x => x.WorkflowState != Constants.WorkflowStates.Removed).ToListAsync();
-                    await using MicrotingDbContext sdkDbContext = _sdkCore.dbContextHelper.GetDbContext();
                     foreach (AssignedSite site in sites)
                     {
                         Site sdkSite = await sdkDbContext.Sites.SingleAsync(x => x.MicrotingUid == site.SiteMicrotingUid);
@@ -317,7 +317,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                     WorkOrder workOrder = await _dbContext.WorkOrders.FindAsync(workOrdersTemplate.WorkOrderId);
 
-                    Language language = await _sdkCore.dbContextHelper.GetDbContext().Languages
+                    Language language = await sdkDbContext.Languages
                         .SingleAsync(x => x.LanguageCode == "da");
                     ReplyElement replyElement = await _sdkCore.CaseRead(message.MicrotingId, message.CheckUId, language);
                     CheckListValue checkListValue = (CheckListValue)replyElement.ElementList[0];
