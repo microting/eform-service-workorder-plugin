@@ -31,11 +31,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.6" />
-    <PackageReference Include="Microting.eForm" Version="4.3.17" />
+    <PackageReference Include="Microting.eForm" Version="4.4.1" />
     <PackageReference Include="Microting.WindowsService.BasePn" Version="2.0.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
-    <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.95" />
-    <PackageReference Include="Microting.WorkOrderBase" Version="1.2.18" />
+    <PackageReference Include="Microting.eFormApi.BasePn" Version="2.0.97" />
+    <PackageReference Include="Microting.WorkOrderBase" Version="1.2.20" />
     <PackageReference Include="HtmlToOpenXml.dll" Version="2.2.0" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
   </ItemGroup>
