@@ -1,7 +1,7 @@
 # eform-service-workorder-plugin
-
-![.NET Core](https://github.com/microting/eform-service-workorder-plugin/workflows/.NET%20Core/badge.svg)
-
+[![.NET Master](https://github.com/microting/eform-service-workorder-plugin/actions/workflows/dotnet-core-master.yml/badge.svg)](https://github.com/microting/eform-service-workorder-plugin/actions/workflows/dotnet-core-master.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d52c1a82b4a362b231f3/maintainability)](https://codeclimate.com/github/microting/eform-service-workorder-plugin/maintainability)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ad0d84b623d14889b15946d85c218a64)](https://www.codacy.com/gh/microting/eform-service-workorder-plugin/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=microting/eform-service-workorder-plugin&amp;utm_campaign=Badge_Grade)
 ## WARNINIG! NOT TO BE USED SEPERATLY
 
 # Plugin automatic installation
