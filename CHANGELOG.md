@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.0.61](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.61) (2021-03-05)
+
+[Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.60...v1.0.61)
+
+**Implemented enhancements:**
+
+- Bump Microting.WorkOrderBase from 1.2.21 to 1.2.22 [\#59](https://github.com/microting/eform-service-workorder-plugin/issues/59)
+- Bump Microting.eFormApi.BasePn from 2.0.98 to 2.0.99 [\#58](https://github.com/microting/eform-service-workorder-plugin/issues/58)
+- Bump Microting.eForm from 4.4.2 to 4.4.3 [\#57](https://github.com/microting/eform-service-workorder-plugin/issues/57)
+
+**Merged pull requests:**
+
+- Bump Microsoft.NET.Test.Sdk from 16.8.3 to 16.9.1 [\#53](https://github.com/microting/eform-service-workorder-plugin/pull/53) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+
 ## [v1.0.60](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.60) (2021-02-24)
 
 [Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.59...v1.0.60)
