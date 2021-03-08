@@ -7,7 +7,7 @@ if (( "$GIT_STATUS" > 0 )); then
 	cd ServiceWorkOrdersPlugin
   CURRENT_NUMBER_OF_COMMITS=`git log --oneline | wc -l`
 
-	PACKAGES=('Microting.eForm' 'Microting.eFormApi.BasePn' 'Microting.WorkOrderBase')
+	PACKAGES=('Microting.eForm' 'Microting.eFormApi.BasePn' 'Microting.WorkOrderBase' 'DocumentFormat.OpenXml')
 	PROJECT_NAME='ServiceWorkOrdersPlugin.csproj'
 	REPOSITORY='eform-service-workorder-plugin'
 
