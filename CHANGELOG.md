@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.0.64](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.64) (2021-03-16)
+
+[Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.63...v1.0.64)
+
+**Implemented enhancements:**
+
+- Bump Microting.WorkOrderBase from 1.2.25 to 1.2.26 [\#71](https://github.com/microting/eform-service-workorder-plugin/issues/71)
+
+## [v1.0.63](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.63) (2021-03-16)
+
+[Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.62...v1.0.63)
+
 ## [v1.0.62](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.62) (2021-03-09)
 
 [Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.61...v1.0.62)
@@ -274,6 +286,7 @@
 **Merged pull requests:**
 
 - Added PDF generation should be tested [\#6](https://github.com/microting/eform-service-workorder-plugin/pull/6) ([Gid733](https://github.com/Gid733))
+- Updates [\#3](https://github.com/microting/eform-service-workorder-plugin/pull/3) ([Gid733](https://github.com/Gid733))
 
 ## [v1.0.5](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.5) (2020-09-23)
 
@@ -302,10 +315,6 @@
 ## [v1.0.1](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.1) (2020-09-18)
 
 [Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.0...v1.0.1)
-
-**Merged pull requests:**
-
-- Updates [\#3](https://github.com/microting/eform-service-workorder-plugin/pull/3) ([Gid733](https://github.com/Gid733))
 
 ## [v1.0.0](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.0) (2020-09-17)
 
