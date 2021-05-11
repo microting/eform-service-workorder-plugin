@@ -37,8 +37,11 @@ namespace ServiceWorkOrdersPlugin.Installers
         private readonly string _connectionString;
         private readonly int _maxParallelism;
         private readonly int _numberOfWorkers;
+        private readonly string _rabbitMqUser;
+        private readonly string _rabbitMqPassword;
+        private readonly string _rabbitMqHost;
 
-        public RebusInstaller(string connectionString, int maxParallelism, int numberOfWorkers)
+        public RebusInstaller(string connectionString, int maxParallelism, int numberOfWorkers, string rabbitMqUser, string rabbitMqPassword, string rabbitMqHost)
         {
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -47,13 +50,16 @@ namespace ServiceWorkOrdersPlugin.Installers
             _connectionString = connectionString;
             _maxParallelism = maxParallelism;
             _numberOfWorkers = numberOfWorkers;
+            _rabbitMqUser = rabbitMqUser;
+            _rabbitMqPassword = rabbitMqPassword;
+            _rabbitMqHost = rabbitMqHost;
         }
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             Configure.With(new CastleWindsorContainerAdapter(container))
                 .Logging(l => l.ColoredConsole())
-                .Transport(t => t.UseRabbitMq("amqp://admin:password@localhost", "eform-service-workorders-plugin"))
+                .Transport(t => t.UseRabbitMq($"amqp://{_rabbitMqUser}:{_rabbitMqPassword}@{_rabbitMqHost}", "eform-service-workorders-plugin"))
                 .Options(o =>
                 {
                     o.SetMaxParallelism(_maxParallelism);
