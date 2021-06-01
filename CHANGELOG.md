@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.0.86](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.86) (2021-06-01)
+
+[Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.85...v1.0.86)
+
+**Implemented enhancements:**
+
+- Bump Microting.WorkOrderBase from 2.0.13 to 2.0.14 [\#196](https://github.com/microting/eform-service-workorder-plugin/issues/196)
+- Bump Microting.eFormApi.BasePn from 3.0.15 to 3.0.16 [\#195](https://github.com/microting/eform-service-workorder-plugin/issues/195)
+- Bump Microting.eForm from 5.2.5 to 5.2.7 [\#194](https://github.com/microting/eform-service-workorder-plugin/issues/194)
+
 ## [v1.0.85](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.85) (2021-05-31)
 
 [Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.84...v1.0.85)
@@ -83,7 +93,6 @@
 **Implemented enhancements:**
 
 - Bump Microting.WorkOrderBase from 2.0.1 to 2.0.3 [\#160](https://github.com/microting/eform-service-workorder-plugin/issues/160)
-- Bump Microting.eFormApi.BasePn from 3.0.3 to 3.0.5 [\#159](https://github.com/microting/eform-service-workorder-plugin/issues/159)
 - Bump Microting.eForm from 5.0.4 to 5.1.1 [\#158](https://github.com/microting/eform-service-workorder-plugin/issues/158)
 
 ## [v1.0.77](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.77) (2021-05-03)
@@ -92,6 +101,7 @@
 
 **Implemented enhancements:**
 
+- Bump Microting.eFormApi.BasePn from 3.0.3 to 3.0.5 [\#159](https://github.com/microting/eform-service-workorder-plugin/issues/159)
 - Bump Microting.WorkOrderBase from 2.0.0 to 2.0.1 [\#154](https://github.com/microting/eform-service-workorder-plugin/issues/154)
 - Bump Microting.eFormApi.BasePn from 3.0.1 to 3.0.3 [\#153](https://github.com/microting/eform-service-workorder-plugin/issues/153)
 - Bump Microting.eForm from 5.0.2 to 5.0.4 [\#152](https://github.com/microting/eform-service-workorder-plugin/issues/152)
