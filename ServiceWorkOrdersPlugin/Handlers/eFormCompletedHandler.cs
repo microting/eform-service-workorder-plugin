@@ -268,9 +268,17 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         DataElement dataElement = (DataElement)mainElement.ElementList[0];
                         mainElement.Label = fields[3].FieldValues[0].Value;
                         mainElement.PushMessageTitle = mainElement.Label;
-                        mainElement.PushMessageBody = string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
-                            ? ""
-                            : $"{Translations.DontAtTheLatst}: " + DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                        mainElement.PushMessageBody = (string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable) || fields[0].FieldValues[0].ValueReadable == "null")
+                            ? "" :
+                            $"{fields[0].FieldValues[0].ValueReadable}";
+                        mainElement.PushMessageBody += (string.IsNullOrEmpty(fields[1].FieldValues[0].ValueReadable) || fields[1].FieldValues[0].ValueReadable == "null")
+                            ? " ("
+                            :$" ({fields[1].FieldValues[0].ValueReadable}";
+
+                        mainElement.PushMessageBody += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
+                            ? ")"
+                            : $"; {DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy")})";
+
                         dataElement.Label = fields[3].FieldValues[0].Value;
                         dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable) || fields[0].FieldValues[0].ValueReadable == "null")
                             ? "" :
