@@ -29,6 +29,7 @@ using Rebus.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Rebus.Logging;
 
 namespace ServiceWorkOrdersPlugin.Installers
 {
@@ -58,7 +59,7 @@ namespace ServiceWorkOrdersPlugin.Installers
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
             Configure.With(new CastleWindsorContainerAdapter(container))
-                .Logging(l => l.ColoredConsole())
+                .Logging(l => l.ColoredConsole(LogLevel.Info))
                 .Transport(t => t.UseRabbitMq($"amqp://{_rabbitMqUser}:{_rabbitMqPassword}@{_rabbitMqHost}", "eform-service-workorders-plugin"))
                 .Options(o =>
                 {
