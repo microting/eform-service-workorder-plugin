@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.0.107](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.107) (2021-09-14)
+
+[Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.106...v1.0.107)
+
+**Implemented enhancements:**
+
+- Bump Microting.WorkOrderBase from 2.0.40 to 2.0.41 [\#273](https://github.com/microting/eform-service-workorder-plugin/issues/273)
+- Bump Microting.eFormApi.BasePn from 3.0.46 to 3.0.47 [\#272](https://github.com/microting/eform-service-workorder-plugin/issues/272)
+- Bump Microting.eForm from 5.2.36 to 5.2.37 [\#271](https://github.com/microting/eform-service-workorder-plugin/issues/271)
+
 ## [v1.0.106](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.106) (2021-09-14)
 
 [Full Changelog](https://github.com/microting/eform-service-workorder-plugin/compare/v1.0.105...v1.0.106)
@@ -348,7 +358,6 @@
 - Bump Microting.WorkOrderBase from 1.2.45 to 1.2.46 [\#129](https://github.com/microting/eform-service-workorder-plugin/issues/129)
 - Bump Microting.eFormApi.BasePn from 2.0.128 to 2.0.129 [\#128](https://github.com/microting/eform-service-workorder-plugin/issues/128)
 - Bump Microting.eForm from 4.4.37 to 4.4.38 [\#127](https://github.com/microting/eform-service-workorder-plugin/issues/127)
-- Bump Microting.eFormApi.BasePn from 2.0.126 to 2.0.128 [\#125](https://github.com/microting/eform-service-workorder-plugin/issues/125)
 
 ## [v1.0.71](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.71) (2021-04-19)
 
@@ -357,6 +366,7 @@
 **Implemented enhancements:**
 
 - Bump Microting.WorkOrderBase from 1.2.43 to 1.2.45 [\#126](https://github.com/microting/eform-service-workorder-plugin/issues/126)
+- Bump Microting.eFormApi.BasePn from 2.0.126 to 2.0.128 [\#125](https://github.com/microting/eform-service-workorder-plugin/issues/125)
 - Bump Microting.eForm from 4.4.35 to 4.4.37 [\#124](https://github.com/microting/eform-service-workorder-plugin/issues/124)
 
 ## [v1.0.70](https://github.com/microting/eform-service-workorder-plugin/tree/v1.0.70) (2021-04-14)
