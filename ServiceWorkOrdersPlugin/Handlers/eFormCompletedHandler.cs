@@ -277,7 +277,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
 
                         mainElement.PushMessageBody += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                             ? ")"
-                            : $"; {DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy")})";
+                            : $"; {DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd.MM.yyyy")})";
 
                         dataElement.Label = fields[3].FieldValues[0].Value;
                         dataElement.Description.InderValue += (string.IsNullOrEmpty(fields[0].FieldValues[0].ValueReadable) || fields[0].FieldValues[0].ValueReadable == "null")
@@ -290,7 +290,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                         dataElement.Description.InderValue += $"<strong>{Translations.DontAtTheLatst}:</strong>"; // Needs i18n support "Corrected at the latest:"
                         dataElement.Description.InderValue += string.IsNullOrEmpty(fields[4].FieldValues[0].Value)
                             ? ""
-                            : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd-MM-yyyy");
+                            : DateTime.Parse(fields[4].FieldValues[0].Value).ToString("dd.MM.yyyy");
 
                         dataElement.DataItemList[0].Description.InderValue = dataElement.Description.InderValue;
                         dataElement.DataItemList[0].Label = dataElement.Label;
