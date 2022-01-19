@@ -71,7 +71,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
             {
                 _s3Enabled = _sdkCore.GetSdkSetting(Settings.s3Enabled).Result.ToLower() == "true";
                 _swiftEnabled = _sdkCore.GetSdkSetting(Settings.swiftEnabled).Result.ToLower() == "true";
-                string downloadPath = await _sdkCore.GetSdkSetting(Settings.fileLocationPdf);
+                string downloadPath = Path.Combine(Path.GetTempPath(), "reports", "results");
+                Directory.CreateDirectory(downloadPath);
 
                 // Docx and PDF files
                 string timeStamp = DateTime.UtcNow.ToString("yyyyMMdd") + "_" + DateTime.UtcNow.ToString("hhmmss");
@@ -208,7 +209,8 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     var docxFileStream = new MemoryStream();
                     await docxFileResourceStream.CopyToAsync(docxFileStream);
                     await docxFileResourceStream.DisposeAsync();
-                    string basePicturePath = await _sdkCore.GetSdkSetting(Settings.fileLocationPicture);
+                    string basePicturePath = Path.Combine(Path.GetTempPath(), "pictures", "workorders");
+                    Directory.CreateDirectory(basePicturePath);
                     var word = new WordProcessor(docxFileStream);
                     string imagesHtml = "";
 
@@ -225,13 +227,13 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     docxFileStream.Position = 0;
 
                     // Build docx
-                    await using (var docxFile = new FileStream(docxFileName, FileMode.Create, FileAccess.Write))
+                    await using (var docxFile = new FileStream(Path.Combine(Path.GetTempPath(), "reports", "results", docxFileName), FileMode.Create, FileAccess.Write))
                     {
                         docxFileStream.WriteTo(docxFile);
                     }
 
                     // Convert to PDF
-                    ReportHelper.ConvertToPdf(docxFileName, downloadPath);
+                    ReportHelper.ConvertToPdf(Path.Combine(Path.GetTempPath(), "reports", "results", docxFileName), downloadPath);
                     File.Delete(docxFileName);
 
                     // Upload PDF
@@ -241,7 +243,7 @@ namespace ServiceWorkOrdersPlugin.Handlers
                     {
                         //rename local file
                         FileInfo fileInfo = new FileInfo(tempPDFFilePath);
-                        fileInfo.CopyTo(downloadPath + hash + ".pdf", true);
+                        fileInfo.CopyTo(downloadPath + "/" + hash + ".pdf", true);
                         fileInfo.Delete();
                         await _sdkCore.PutFileToStorageSystem(Path.Combine(downloadPath, $"{hash}.pdf"), $"{hash}.pdf");
 
